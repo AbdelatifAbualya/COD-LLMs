@@ -1,34 +1,27 @@
-// Vercel Edge Function for Fireworks.ai API Proxy
-export default async function handler(request, context) {
+// Vercel Serverless Function for Fireworks.ai API Proxy
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
   // Log function invocation to help with debugging
   console.log("Fireworks API proxy called:", new Date().toISOString());
   
   // Handle CORS for preflight requests
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Max-Age': '86400'
-      }
-    });
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    res.status(204).end();
+    return;
   }
 
   // Only allow POST requests
-  if (request.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Method Not Allowed' }),
-      {
-        status: 405,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Allow': 'POST'
-        }
-      }
-    );
+  if (req.method !== 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Allow', 'POST');
+    res.status(405).json({ error: 'Method Not Allowed' });
+    return;
   }
 
   try {
@@ -38,40 +31,28 @@ export default async function handler(request, context) {
     
     if (!apiKey) {
       console.error("ERROR: Fireworks API key is missing in environment variables");
-      return new Response(
-        JSON.stringify({
-          error: 'API key not configured',
-          message: 'Please set FIREWORKS_API_KEY in your Vercel environment variables'
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        }
-      );
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(500).json({
+        error: 'API key not configured',
+        message: 'Please set FIREWORKS_API_KEY in your Vercel environment variables'
+      });
+      return;
     }
 
     // Parse request body
     let requestBody;
     try {
-      requestBody = await request.json();
+      requestBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     } catch (parseError) {
       console.error("Failed to parse request body:", parseError);
-      return new Response(
-        JSON.stringify({
-          error: 'Invalid JSON in request body',
-          message: parseError.message
-        }),
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        }
-      );
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(400).json({
+        error: 'Invalid JSON in request body',
+        message: parseError.message
+      });
+      return;
     }
 
     // Log request info (non-sensitive)
@@ -145,19 +126,13 @@ export default async function handler(request, context) {
           console.error(`Failed to read error response: ${e.message}`);
         }
         
-        return new Response(
-          JSON.stringify({ 
-            error: `API Error: ${response.statusText}`, 
-            details: errorDetails
-          }),
-          {
-            status: response.status,
-            headers: { 
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            }
-          }
-        );
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(response.status).json({ 
+          error: `API Error: ${response.statusText}`, 
+          details: errorDetails
+        });
+        return;
       }
       
       // Get the response data
@@ -172,68 +147,42 @@ export default async function handler(request, context) {
       }
       
       // Return the response from Fireworks.ai
-      return new Response(
-        JSON.stringify(data),
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
-          }
-        }
-      );
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.status(200).json(data);
+      
     } catch (fetchError) {
       // Clear the timeout to prevent memory leaks
       clearTimeout(timeoutId);
       
       // Check if this is an abort error (timeout)
       if (fetchError.name === 'AbortError') {
-        return new Response(
-          JSON.stringify({ 
-            error: 'Gateway Timeout', 
-            message: 'The request to the LLM API took too long to complete (>120 seconds). Try reducing complexity or using fewer tokens.'
-          }),
-          {
-            status: 504,
-            headers: { 
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            }
-          }
-        );
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(504).json({ 
+          error: 'Gateway Timeout', 
+          message: 'The request to the LLM API took too long to complete (>120 seconds). Try reducing complexity or using fewer tokens.'
+        });
+        return;
       }
       
       // Handle other fetch errors
       console.error("Fetch error:", fetchError);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Request Failed', 
-          message: fetchError.message
-        }),
-        {
-          status: 500,
-          headers: { 
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        }
-      );
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(500).json({ 
+        error: 'Request Failed', 
+        message: fetchError.message
+      });
     }
   } catch (error) {
     console.error('Function error:', error.message, error.stack);
-    return new Response(
-      JSON.stringify({ 
-        error: 'Internal Server Error', 
-        message: error.message
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      }
-    );
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(500).json({ 
+      error: 'Internal Server Error', 
+      message: error.message
+    });
   }
-}
+};
