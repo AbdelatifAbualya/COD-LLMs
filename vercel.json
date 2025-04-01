@@ -1,5 +1,13 @@
 {
   "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/api-proxy.js", "use": "@vercel/node" },
+    { "src": "api/streaming-edge.js", "use": "@vercel/edge" },
+    { "src": "api/perplexity.js", "use": "@vercel/node" },
+    { "src": "api/proxy.js", "use": "@vercel/node" },
+    { "src": "api/streaming.js", "use": "@vercel/node" }
+  ],
   "buildCommand": "",
   "outputDirectory": "",
   "rewrites": [
@@ -25,5 +33,13 @@
     "api/streaming.js": {
       "runtime": "nodejs18.x"
     }
-  }
+  },
+  "routes": [
+    { "src": "/api/perplexity", "dest": "/api/perplexity.js" },
+    { "src": "/api/streaming-edge", "dest": "/api/streaming-edge.js" },
+    { "src": "/api/streaming", "dest": "/api/streaming.js" },
+    { "src": "/api/proxy", "dest": "/api/proxy.js" },
+    { "src": "/api/(.*)", "dest": "/api/api-proxy.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
