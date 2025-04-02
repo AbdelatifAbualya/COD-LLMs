@@ -24,6 +24,9 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // Flag to track if response has been sent
+  let responseSent = false;
+
   try {
     // Get API key from environment variable - add debug logging
     const apiKey = process.env.FIREWORKS_API_KEY;
@@ -37,6 +40,7 @@ module.exports = async (req, res) => {
         error: 'API key not configured',
         message: 'Please set FIREWORKS_API_KEY in your Vercel environment variables'
       });
+      responseSent = true;
       return;
     }
 
@@ -52,6 +56,7 @@ module.exports = async (req, res) => {
         error: 'Invalid JSON in request body',
         message: parseError.message
       });
+      responseSent = true;
       return;
     }
 
@@ -136,49 +141,33 @@ module.exports = async (req, res) => {
           error: `API Error: ${response.statusText}`, 
           details: errorDetails
         });
+        responseSent = true;
         return;
       }
       
-      // Handle streaming response - pipe directly to client without trying to parse JSON
+      // Handle streaming response - use Node.js pipe instead of getReader
       if (isStreaming) {
         // Set appropriate headers for streaming
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.flushHeaders(); // Important for streaming
         
-        // Create a reader from the response body stream
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
+        // Use pipe for Node.js environment
+        response.body.pipe(res);
+        responseSent = true;
         
-        // Process the stream
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-              // End the response when done
-              res.end();
-              break;
-            }
-            
-            // Decode chunk and send to client
-            const chunk = decoder.decode(value, { stream: true });
-            res.write(chunk);
-            
-            // Flush the data to ensure it's sent immediately
-            if (res.flush) {
-              res.flush();
-            }
-          }
-        } catch (streamError) {
+        // Handle stream completion
+        response.body.on('end', () => {
+          console.log('Stream ended');
+        });
+        
+        // Handle stream errors
+        response.body.on('error', (streamError) => {
           console.error('Error while streaming:', streamError);
-          // If there's an error during streaming, we need to end the response
-          if (!res.writableEnded) {
-            res.write(`data: {"error": "Stream error: ${streamError.message}"}\n\n`);
-            res.end();
-          }
-        }
+          // Can't write headers/body after pipe has started
+        });
+        
         return;
       }
       
@@ -198,10 +187,18 @@ module.exports = async (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.status(200).json(data);
+      responseSent = true;
+      return;
       
     } catch (fetchError) {
       // Clear the timeout to prevent memory leaks
       clearTimeout(timeoutId);
+      
+      // Don't try to send response if one was already sent
+      if (responseSent) {
+        console.error("Error occurred, but response already sent:", fetchError);
+        return;
+      }
       
       // Check if this is an abort error (timeout)
       if (fetchError.name === 'AbortError') {
@@ -224,6 +221,12 @@ module.exports = async (req, res) => {
       });
     }
   } catch (error) {
+    // Don't try to send response if one was already sent
+    if (responseSent) {
+      console.error("Error occurred, but response already sent:", error);
+      return;
+    }
+    
     console.error('Function error:', error.message, error.stack);
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
