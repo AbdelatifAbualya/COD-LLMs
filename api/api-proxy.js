@@ -76,6 +76,10 @@ module.exports = async (req, res) => {
       max_tokens: requestBody.max_tokens || 'default'
     })}`);
     
+    // Check if this is a streaming request
+    const isStreaming = requestBody.stream === true;
+    console.log(`Stream mode: ${isStreaming ? 'enabled' : 'disabled'}`);
+    
     // Validate max_tokens (Fireworks models accept different limits based on model)
     const originalMaxTokens = requestBody.max_tokens || 4096;
     const validatedMaxTokens = Math.min(Math.max(1, originalMaxTokens), 8192);
@@ -135,7 +139,50 @@ module.exports = async (req, res) => {
         return;
       }
       
-      // Get the response data
+      // Handle streaming response - pipe directly to client without trying to parse JSON
+      if (isStreaming) {
+        // Set appropriate headers for streaming
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.flushHeaders(); // Important for streaming
+        
+        // Create a reader from the response body stream
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        // Process the stream
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              // End the response when done
+              res.end();
+              break;
+            }
+            
+            // Decode chunk and send to client
+            const chunk = decoder.decode(value, { stream: true });
+            res.write(chunk);
+            
+            // Flush the data to ensure it's sent immediately
+            if (res.flush) {
+              res.flush();
+            }
+          }
+        } catch (streamError) {
+          console.error('Error while streaming:', streamError);
+          // If there's an error during streaming, we need to end the response
+          if (!res.writableEnded) {
+            res.write(`data: {"error": "Stream error: ${streamError.message}"}\n\n`);
+            res.end();
+          }
+        }
+        return;
+      }
+      
+      // For non-streaming responses, parse as JSON and return normally
       const data = await response.json();
       
       // Add performance metrics to response
