@@ -3,42 +3,18 @@
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
     { "src": "api/api-proxy.js", "use": "@vercel/node" },
-    { "src": "api/streaming-edge.js", "use": "@vercel/edge" },
     { "src": "api/perplexity.js", "use": "@vercel/node" },
     { "src": "api/proxy.js", "use": "@vercel/node" },
-    { "src": "api/streaming.js", "use": "@vercel/node" }
+    { "src": "api/streaming.js", "use": "@vercel/node" },
+    { "src": "api/rag.js", "use": "@vercel/node" },
+    { "src": "api/mongodb-status.js", "use": "@vercel/node" }
   ],
-  "buildCommand": "",
-  "outputDirectory": "",
-  "rewrites": [
-    { "source": "/api/perplexity", "destination": "/api/perplexity.js" },
-    { "source": "/api/streaming-edge", "destination": "/api/streaming-edge.js" },
-    { "source": "/api/streaming", "destination": "/api/streaming.js" },
-    { "source": "/api/proxy", "destination": "/api/proxy.js" },
-    { "source": "/api/(.*)", "destination": "/api/api-proxy.js" }
-  ],
-  "functions": {
-    "api/streaming-edge.js": {
-      "runtime": "edge"
-    },
-    "api/api-proxy.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/perplexity.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/proxy.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/streaming.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "routes": [
     { "src": "/api/perplexity", "dest": "/api/perplexity.js" },
-    { "src": "/api/streaming-edge", "dest": "/api/streaming-edge.js" },
     { "src": "/api/streaming", "dest": "/api/streaming.js" },
     { "src": "/api/proxy", "dest": "/api/proxy.js" },
+    { "src": "/api/rag", "dest": "/api/rag.js" },
+    { "src": "/api/mongodb-status", "dest": "/api/mongodb-status.js" },
     { "src": "/api/(.*)", "dest": "/api/api-proxy.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
