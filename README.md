@@ -1,5 +1,5 @@
 # enhanced-llm-playground Enhanced LLM Playground (Hosted via Fireworks.ai)
-This project provides an interactive web-based playground for experimenting with various Large Language Models (LLMs). It's optimized for speed, flexibility, and real-time response streaming by leveraging Fireworks.ai as the backend for model inference.
+This project provides an interactive web-based playground for experimenting with various Large Language Models (LLMs). It's optimized for speed, flexibility, with COD reasoning, and real-time response streaming by leveraging Fireworks.ai as the backend for model inference.
 
  Key Features
 Hosted on Fireworks.ai: All models used are served via Fireworks.ai, ensuring fast, cost-effective, and scalable performance.
