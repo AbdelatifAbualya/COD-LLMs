@@ -5323,6 +5323,9 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     }
     
     // Custom model handling
+    
+
+    // Custom model handling
     function setupModelInput() {
       const modelSelect = document.getElementById('modelSelect');
       const setModelBtn = document.getElementById('setModelBtn');
@@ -5330,92 +5333,101 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       const selectedModelName = document.getElementById('selectedModelName');
       const modelTags = document.getElementById('modelTags');
       const modelDescription = document.getElementById('modelDescription');
-      
-      // Model information database
+
+      // Model information database - MODIFIED TO CONTAIN ONLY THE 4 REQUESTED MODELS
       const modelInfo = {
-        "accounts/fireworks/models/deepseek-v3-0324": {
+        // Kept DeepSeek V3
+        "accounts/fireworks/models/deepseek-v3": {
           name: "DeepSeek V3",
-          tags: ["Latest", "Versatile", "Advanced"],
+          tags: ["Latest", "Versatile", "Advanced", "Chat"],
           description: "DeepSeek's latest model with strong all-around capabilities and reasoning."
         },
-        "accounts/fireworks/models/qwen2p5-coder-32b-instruct": {
-          name: "Qwen2.5 Coder 32B",
-          tags: ["Coding", "Technical", "Efficient"],
-          description: "Specialized model for programming and technical tasks with excellent code generation."
+        // ADDED BACK DeepSeek R1
+        "accounts/fireworks/models/deepseek-r1": {
+          name: "DeepSeek R1 (Reasoner)",
+          tags: ["Reasoner", "Advanced", "Complex Tasks"],
+          description: "DeepSeek model focused on complex reasoning tasks."
         },
-        "accounts/fireworks/models/llama-v3p3-70b-instruct": {
-          name: "Llama 3.3 70B",
-          tags: ["Powerful", "Latest", "Versatile"],
-          description: "Latest Llama model with enhanced reasoning and broad capabilities."
+        // Kept Llama4 Maverick
+        "accounts/fireworks/models/llama4-maverick-instruct-basic": {
+          name: "Llama4 Maverick Instruct",
+          tags: ["New", "Llama4", "Vision", "1M Context"],
+          description: "Fireworks Llama 4 Maverick model with large context and vision capabilities."
         },
-        "accounts/fireworks/models/llama-v3p1-8b-instruct": {
-          name: "Llama 3.1 8B",
-          tags: ["Fast", "Efficient", "Compact"],
-          description: "Smaller Llama model offering good balance between performance and speed."
-        },
-        "accounts/fireworks/models/mixtral-8x22b-instruct": {
-          name: "Mixtral 8x22B",
-          tags: ["MoE", "Advanced", "Powerful"],
-          description: "Mixture of Experts model with excellent reasoning and knowledge capabilities."
-        },
-        "accounts/fireworks/models/phi-3-vision-128k-instruct": {
-          name: "Phi-3 Vision",
-          tags: ["Vision", "Multimodal", "Latest"],
-          description: "Microsoft's Phi-3 model with vision capabilities for analyzing images and text together."
+        // Kept Llama4 Scout
+        "accounts/fireworks/models/llama4-scout-instruct-basic": {
+            name: "Llama4 Scout Instruct",
+            tags: ["New", "Llama4", "Vision", "128k Context"],
+            description: "Fireworks Llama 4 Scout model with vision capabilities."
         }
+        // Onyx model ID could not be found and is not included.
+        // Other models have been removed as requested.
       };
-      
+
       // Clear existing options
       modelSelect.innerHTML = '<option value="" disabled selected>Choose a model...</option>';
-      
-      // Sort models by name
-      const sortedModels = Object.entries(modelInfo).sort((a, b) => 
+
+      // Sort models by name (will sort the 4 remaining)
+      const sortedModels = Object.entries(modelInfo).sort((a, b) =>
         a[1].name.localeCompare(b[1].name)
       );
-      
-      // Add models from the modelInfo object
+
+      // Add the 4 models from the modelInfo object to the dropdown
       sortedModels.forEach(([id, info]) => {
         const option = document.createElement('option');
         option.value = id;
         option.textContent = info.name;
         modelSelect.appendChild(option);
       });
-      
-      // Initialize with current model if set
+
+      // Initialize with current model if set and valid, otherwise default to the first available
+      let defaultModelSet = false;
       if (MODEL_NAME && modelInfo[MODEL_NAME]) {
         modelSelect.value = MODEL_NAME;
         updateModelInfo(MODEL_NAME);
-      } else {
-        // Set default to Llama 3.3 70B if no model is selected
-        MODEL_NAME = "accounts/fireworks/models/llama-v3p3-70b-instruct";
-        MODEL_NAME_DISPLAY = "Llama 3.3 70B";
-        modelSelect.value = MODEL_NAME;
-        updateModelInfo(MODEL_NAME);
+        defaultModelSet = true;
+      } else if (sortedModels.length > 0) {
+          // If saved model isn't in the new list, default to the first model in the filtered list
+          MODEL_NAME = sortedModels[0][0];
+          MODEL_NAME_DISPLAY = sortedModels[0][1].name;
+          modelSelect.value = MODEL_NAME;
+          updateModelInfo(MODEL_NAME);
+          defaultModelSet = true;
+          console.log("Defaulting to first available model:", MODEL_NAME_DISPLAY);
       }
-      
+
+       if (!defaultModelSet) {
+           console.warn("No models available to select.");
+           // Optionally disable the select/button or show a message
+           if (setModelBtn) setModelBtn.disabled = true;
+       } else {
+            if (setModelBtn) setModelBtn.disabled = false;
+       }
+
+
       // Update model info card when selection changes
       modelSelect.addEventListener('change', () => {
         const selectedModel = modelSelect.value;
         updateModelInfo(selectedModel);
-        
+
         // Show visual feedback on change
         modelSelect.style.borderColor = 'var(--accent-primary)';
         setTimeout(() => {
           modelSelect.style.borderColor = '';
         }, 500);
       });
-      
+
       function updateModelInfo(modelId) {
         if (!modelInfoCard) return;
-        
+
         if (modelInfo[modelId]) {
           const info = modelInfo[modelId];
-          
+
           // Update header
           if (selectedModelName) {
             selectedModelName.textContent = info.name;
           }
-          
+
           // Update tags with animation
           if (modelTags) {
             modelTags.style.opacity = '0';
@@ -5426,7 +5438,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               modelTags.style.opacity = '1';
             }, 150);
           }
-          
+
           // Update description with animation
           if (modelDescription) {
             modelDescription.style.opacity = '0';
@@ -5435,12 +5447,12 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               modelDescription.style.opacity = '1';
             }, 150);
           }
-          
+
           // Show the card with animation
           modelInfoCard.style.display = 'block';
           modelInfoCard.style.opacity = '0';
           modelInfoCard.style.transform = 'translateY(10px)';
-          
+
           requestAnimationFrame(() => {
             modelInfoCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
             modelInfoCard.style.opacity = '1';
@@ -5451,17 +5463,17 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           modelInfoCard.style.display = 'none';
         }
       }
-      
+
       // Set model button enhancement
       if (setModelBtn) {
         setModelBtn.addEventListener('click', () => {
           const modelName = modelSelect.value;
-          if (modelName) {
+          if (modelName && modelInfo[modelName]) { // Ensure selected model exists in map
             MODEL_NAME = modelName;
-            MODEL_NAME_DISPLAY = modelInfo[modelName] ? modelInfo[modelName].name : getModelDisplayName(modelName);
+            MODEL_NAME_DISPLAY = modelInfo[modelName].name; // Get display name from map
             updateCurrentModelDisplay();
             showNotification('Model set: ' + MODEL_NAME_DISPLAY);
-            
+
             // Add visual feedback
             setModelBtn.classList.add('success');
             setTimeout(() => {
