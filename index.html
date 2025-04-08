@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html><html lang="en" class="dark"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2301,22 +2299,76 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       try {
         // Continue with Web Search or regular API calls
         if (useWebSearch) {
-          // Web search logic would go here
-          // For now, just show an error message
-          thread.messages[placeholderIndex] = {
-            content: "Web search is not implemented in this version.",
-            sender: "bot",
-            isPlaceholder: false,
-            timestamp: new Date(),
-            wordCount: 0,
-            reasoningMethod: "STANDARD",
-            thinking: null,
-            answer: null,
-            thinkingWordCount: 0,
-            answerWordCount: 0
-          };
+          // Modify the placeholder to indicate web search is happening
+          thread.messages[placeholderIndex].content = "Searching the web for information...";
           renderCurrentThreadMessages();
-          return;
+          
+          // Timestamp to prevent caching
+          const timestamp = new Date().getTime();
+          const cacheBuster = `?t=${timestamp}`;
+          
+          try {
+            // Call the Perplexity API endpoint
+            const searchResponse = await fetch(`/api/perplexity${cacheBuster}`, {
+              method: "POST",
+              headers: { 
+                "Content-Type": "application/json" 
+              },
+              body: JSON.stringify({ query: message })
+            });
+            
+            if (!searchResponse.ok) {
+              throw new Error(`Error with web search: ${searchResponse.status}`);
+            }
+            
+            const searchData = await searchResponse.json();
+            
+            // Format the response with sources if available
+            let responseContent = searchData.answer || "No answer found";
+            
+            // Add sources if available
+            if (searchData.sources && searchData.sources.length > 0) {
+              responseContent += "\n\n**Sources:**\n";
+              searchData.sources.forEach((source, index) => {
+                responseContent += `${index + 1}. [${source.title || "Source"}](${source.url || "#"})\n`;
+                if (source.snippet) {
+                  responseContent += `   ${source.snippet}\n`;
+                }
+              });
+            }
+            
+            // Update the message with search results
+            thread.messages[placeholderIndex] = {
+              content: responseContent,
+              sender: "bot",
+              isPlaceholder: false,
+              timestamp: new Date(),
+              wordCount: countWords(responseContent),
+              reasoningMethod: "WEB-SEARCH",
+              thinking: null,
+              answer: responseContent,
+              thinkingWordCount: 0,
+              answerWordCount: countWords(responseContent)
+            };
+            renderCurrentThreadMessages();
+            return;
+          } catch (error) {
+            console.error("Web search error:", error);
+            thread.messages[placeholderIndex] = {
+              content: `Web search error: ${error.message}. Try again or disable web search in settings.`,
+              sender: "bot",
+              isPlaceholder: false,
+              timestamp: new Date(),
+              wordCount: 0,
+              reasoningMethod: "WEB-SEARCH",
+              thinking: null,
+              answer: null,
+              thinkingWordCount: 0,
+              answerWordCount: 0
+            };
+            renderCurrentThreadMessages();
+            return;
+          }
         }
         
         // Build messages array with current settings and word count request
