@@ -1,4 +1,4 @@
-// Netlify Function to securely proxy requests to Fireworks.ai
+// Vercel Serverless Function for Fireworks.ai API Proxy
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
@@ -43,6 +43,9 @@ module.exports = async (req, res) => {
       const modelName = requestBody.model || 'not specified';
       console.log(`Model requested: ${modelName}`);
       
+      // Extract thread ID for improved context isolation
+      const threadId = requestBody.threadId || requestBody.user || `thread-${Date.now()}`;
+      
       // Add timing metrics for monitoring CoD vs CoT performance
       let reasoningMethod = 'Standard';
       if (requestBody.messages && requestBody.messages[0] && requestBody.messages[0].content) {
@@ -57,7 +60,8 @@ module.exports = async (req, res) => {
       console.log(`Using reasoning method: ${reasoningMethod}`);
       console.log(`Request complexity: ${JSON.stringify({
         messages_count: requestBody.messages ? requestBody.messages.length : 0,
-        max_tokens: requestBody.max_tokens || 'default'
+        max_tokens: requestBody.max_tokens || 'default',
+        thread_id: threadId
       })}`);
       
       const startTime = Date.now();
@@ -70,15 +74,34 @@ module.exports = async (req, res) => {
       }, 120000);
       
       try {
+        // Validate max_tokens before sending to API
+        const originalMaxTokens = requestBody.max_tokens || 4096;
+        const validatedMaxTokens = Math.min(Math.max(1, originalMaxTokens), 8192);
+        
+        if (originalMaxTokens !== validatedMaxTokens) {
+          console.log(`Adjusted max_tokens from ${originalMaxTokens} to ${validatedMaxTokens} to meet API requirements`);
+        }
+        
+        // Create modified request body with validated parameters
+        const modifiedRequestBody = {
+          ...requestBody,
+          max_tokens: validatedMaxTokens,
+          user: threadId // Adding thread ID for session isolation
+        };
+        
+        // Special handling for "reset" conversations
+        if (req.query && req.query.reset === 'true') {
+          console.log("Handling context reset request for thread:", threadId);
+        }
+        
         // Forward the request to Fireworks.ai with timeout
-        // Increased timeout to maximum allowed (120 seconds)
         const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${API_KEY}`
           },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify(modifiedRequestBody),
           signal: controller.signal
         });
 
@@ -106,11 +129,21 @@ module.exports = async (req, res) => {
         // Get the response data
         const data = await response.json();
         
+        // Log token usage if available
+        if (data.usage) {
+          console.log(`Token usage for thread ${threadId}:`, {
+            prompt_tokens: data.usage.prompt_tokens,
+            completion_tokens: data.usage.completion_tokens,
+            total_tokens: data.usage.total_tokens
+          });
+        }
+        
         // Add performance metrics to response
         if (data && !data.error) {
           data.performance = {
             response_time_ms: responseTime,
-            reasoning_method: reasoningMethod
+            reasoning_method: reasoningMethod,
+            thread_id: threadId
           };
         }
         
