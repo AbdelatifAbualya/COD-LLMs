@@ -71,7 +71,7 @@
     }
     
     ::-webkit-scrollbar-track {
-      background: rgb(20, 24, 33);
+      background: rgb(30, 34, 43); /* Lighter track color */
       border-radius: 8px;
     }
     
@@ -3353,12 +3353,23 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     
     // Improved Chain of Draft word limit options UI
     function updateCoDOptionsUI() {
-      const codOptions = document.querySelector('.cod-word-limit-options');
+      const codOptions = document.getElementById('codOptions');
       if (!codOptions) return;
       
       // Update selected state
       const options = codOptions.querySelectorAll('.cod-word-limit-option');
+      
+      // First remove all event listeners by cloning options
       options.forEach(option => {
+        const newOption = option.cloneNode(true);
+        option.parentNode.replaceChild(newOption, option);
+      });
+      
+      // Now get the fresh node list after replacement
+      const refreshedOptions = codOptions.querySelectorAll('.cod-word-limit-option');
+      
+      // Update the visual state for each option
+      refreshedOptions.forEach(option => {
         const value = parseInt(option.getAttribute('data-value'));
         if (value === COD_WORD_LIMIT) {
           option.classList.add('border-primary-500');
@@ -3367,26 +3378,25 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           option.classList.remove('border-primary-500');
           option.classList.add('border-dark-500', 'hover:border-primary-400');
         }
-      });
-      
-      // Add event listeners to the word limit options
-      options.forEach(option => {
-        // Remove existing listeners
-        const newOption = option.cloneNode(true);
-        option.parentNode.replaceChild(newOption, option);
         
-        // Add new listener
-        newOption.addEventListener('click', () => {
-          // Update selected state
-          options.forEach(opt => {
-            opt.classList.remove('border-primary-500');
-            opt.classList.add('border-dark-500', 'hover:border-primary-400');
+        // Add new click listener to each option
+        option.addEventListener('click', function() {
+          const clickedValue = parseInt(this.getAttribute('data-value'));
+          
+          // Update all options' visual state
+          refreshedOptions.forEach(opt => {
+            if (parseInt(opt.getAttribute('data-value')) === clickedValue) {
+              opt.classList.add('border-primary-500');
+              opt.classList.remove('border-dark-500', 'hover:border-primary-400');
+            } else {
+              opt.classList.remove('border-primary-500');
+              opt.classList.add('border-dark-500', 'hover:border-primary-400');
+            }
           });
-          newOption.classList.add('border-primary-500');
-          newOption.classList.remove('border-dark-500', 'hover:border-primary-400');
           
           // Update word limit value
-          COD_WORD_LIMIT = parseInt(newOption.getAttribute('data-value'));
+          COD_WORD_LIMIT = clickedValue;
+          console.log("COD word limit changed to:", COD_WORD_LIMIT);
           
           // Update the prompt
           updateCoDPrompt();
@@ -3395,8 +3405,10 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           updateCurrentModelDisplay();
         });
       });
+      
+      console.log("COD options UI updated, current limit:", COD_WORD_LIMIT);
     }
-    
+
     // Improved function to update the CoD prompt when word limit changes
     function updateCoDPrompt() {
       // Update the prompt to reflect new word limit
@@ -3709,11 +3721,16 @@ Separate your steps with periods. Write your final answer after the #### separat
         // Save COD word limit if applicable
         if (REASONING_METHOD === "cod") {
           try {
-            // Get the selected CoD word limit option
+            // Get the selected CoD word limit option directly from DOM
             const selectedOption = document.querySelector('.cod-word-limit-option.border-primary-500');
             if (selectedOption) {
-              COD_WORD_LIMIT = parseInt(selectedOption.getAttribute('data-value'));
-              console.log("COD word limit saved:", COD_WORD_LIMIT);
+              const newValue = parseInt(selectedOption.getAttribute('data-value'));
+              if (!isNaN(newValue)) {
+                COD_WORD_LIMIT = newValue;
+                console.log("COD word limit saved:", COD_WORD_LIMIT);
+              }
+            } else {
+              console.warn("No selected COD word limit option found");
             }
           } catch (codErr) {
             console.error("Error getting COD word limit:", codErr);
@@ -3807,6 +3824,8 @@ Separate your steps with periods. Write your final answer after the #### separat
           localStorage.setItem("modelName", MODEL_NAME);
           localStorage.setItem("reasoningMethod", REASONING_METHOD);
           localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
+          console.log("Saved COD word limit to localStorage:", COD_WORD_LIMIT);
+          // ...existing code...
           localStorage.setItem("enhancedReasoningEnabled", ENHANCED_REASONING_ENABLED.toString());
           localStorage.setItem("reasoningEnhancement", REASONING_ENHANCEMENT);
           localStorage.setItem("temperature", TEMPERATURE.toString());
@@ -3994,7 +4013,13 @@ Separate your steps with periods. Write your final answer after the #### separat
         REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
         
         const codWordLimit = localStorage.getItem("codWordLimit");
-        if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
+        if (codWordLimit) {
+          const parsedLimit = parseInt(codWordLimit);
+          if (!isNaN(parsedLimit)) {
+            COD_WORD_LIMIT = parsedLimit;
+            console.log("Loaded COD word limit:", COD_WORD_LIMIT);
+          }
+        }
         
         // Load enhanced reasoning settings
         const enhancedEnabled = localStorage.getItem("enhancedReasoningEnabled");
@@ -4044,7 +4069,7 @@ Separate your steps with periods. Write your final answer after the #### separat
         // Load self-reflection settings
         const selfReflectionEnabled = localStorage.getItem("selfReflectionEnabled");
         if (selfReflectionEnabled !== null) {
-          SELF_REFLECTION_ENABLED = selfReflectionEnabled === "true";
+          SELF_REFLECTION_ENABLED = selfReflectionEnabled === 'true';
         }
         
         // Load streaming preference
