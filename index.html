@@ -1385,6 +1385,32 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     }
     
     /***********************
+     * Clean Model Output
+     ***********************/
+    function cleanModelOutput(text) {
+      if (!text) return '';
+      
+      // Remove any JSON-like structures and UUIDs
+      let cleaned = text
+        // Remove UUID patterns
+        .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, '')
+        .replace(/[a-f0-9]{7,}[a-f0-9\-]{5,}/g, '')
+        // Remove JSON-like content
+        .replace(/"object"\s*:\s*"[^"]*"/g, '')
+        .replace(/"created"\s*:\s*\d+/g, '')
+        .replace(/"model"\s*:\s*"[^"]*"/g, '')
+        .replace(/"choices"\s*:\s*\[\{/g, '')
+        .replace(/\}\]/g, '')
+        // Clean up any leftover artifacts
+        .replace(/\{\s*"/g, '')
+        .replace(/"\s*\}/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      
+      return cleaned;
+    }
+    
+    /***********************
      * Problem Complexity Analysis
      ***********************/
     function analyzeProblemComplexity(message) {
