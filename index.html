@@ -758,6 +758,8 @@
 
 IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
 
+If the user requests code (e.g., "write code", "python", "give me a function", etc.), use Chain of Draft for your reasoning steps, but provide the full, detailed, and well-formatted code in the final answer. Do NOT apply any word or token limit to the code or final answer. The code should be complete, correct, and ready to use.
+
 Separate your steps with periods. Write your final answer after the #### separator.
 
 Examples:
@@ -1583,6 +1585,13 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           // Extract thinking steps and final answer
           let thinking = content.substring(0, separatorIndex).trim();
           let answer = content.substring(separatorIndex + 4).trim();
+          
+          // If answer contains code block markers, ensure all code blocks are closed
+          const codeBlockStartCount = (answer.match(/```/g) || []).length;
+          if (codeBlockStartCount % 2 !== 0) {
+            // If odd, add closing ```
+            answer += "\n```";
+          }
           
           // Check for reflection step
           const reflectionPatterns = [
@@ -3364,12 +3373,18 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     function updateCoDPrompt() {
       // Update the prompt to reflect new word limit
       const basePrompt = `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
-  
+
+IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
+
+If the user requests code (e.g., "write code", "python", "give me a function", etc.), use Chain of Draft for your reasoning steps, but provide the full, detailed, and well-formatted code in the final answer. Do NOT apply any word or token limit to the code or final answer. The code should be complete, correct, and ready to use.
+
 Separate your steps with periods. Write your final answer after the #### separator.`;
       
       // Add self-reflection instruction if enabled
       const basePromptWithReflection = SELF_REFLECTION_ENABLED ? 
-        basePrompt + `\n\nBefore providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.` : 
+        basePrompt + `
+
+Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.` : 
         basePrompt;
       
       // Keep the examples part of the prompt
