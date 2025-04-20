@@ -4,7 +4,7 @@
   <title>Reasoning Studio - CoT vs CoD</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS - NOTE: For production, install Tailwind as a PostCSS plugin or use Tailwind CLI instead of CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Marked.js for Markdown parsing -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -283,7 +283,7 @@
           <div class="flex flex-col gap-2 mt-1">
             <button id="sendBtn" class="bg-primary-500 hover:bg-primary-600 text-white p-3 rounded-lg transition">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
               </svg>
             </button>
             <label for="fileInput" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2 rounded-lg cursor-pointer transition">
@@ -402,17 +402,10 @@
             <h4 class="text-sm font-medium text-gray-300 mb-2">Word limit per step:</h4>
             <!-- Add wrapper for JS selection -->
             <div class="cod-word-limit-options space-y-2">
-              <div class="cod-word-limit-option bg-dark-600 border border-primary-500 rounded-lg p-3 cursor-pointer" data-value="5">
-                <div class="flex justify-between items-center">
-                  <span class="font-medium">5 words</span>
-                  <span class="bg-primary-500/20 text-primary-300 text-xs px-2 py-1 rounded-full">Paper Standard</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-1">Original paper recommendation</p>
-              </div>
-              
-              <div class="cod-word-limit-option bg-dark-600 border border-dark-500 hover:border-primary-400 rounded-lg p-3 cursor-pointer" data-value="10">
+              <div class="cod-word-limit-option bg-dark-600 border border-primary-500 rounded-lg p-3 cursor-pointer" data-value="10">
                 <div class="flex justify-between items-center">
                   <span class="font-medium">10 words</span>
+                  <span class="bg-primary-500/20 text-primary-300 text-xs px-2 py-1 rounded-full">Recommended</span>
                 </div>
                 <p class="text-xs text-gray-400 mt-1">Balanced brevity and clarity</p>
               </div>
@@ -444,56 +437,6 @@
               <div class="mt-3 space-y-2">
                 <div class="text-gray-400 text-sm">Q: If a fabric store received 45 yards of cotton and used 2/9 of it, how many yards remain?</div>
                 <div class="text-primary-300 font-mono text-sm">A: Total: 45 yards. Used: 2/9 × 45 = 10 yards. Remaining: 45 - 10 = 35 yards. #### 35 yards</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Enhanced Reasoning Options -->
-          <div class="flex justify-between items-center mb-4 mt-6 pb-2 border-b border-dark-600">
-            <h3 class="text-lg font-medium">Advanced Reasoning Options</h3>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="enhancedReasoningToggle" class="sr-only peer" checked="">
-              <div class="w-11 h-6 bg-dark-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-            </label>
-          </div>
-          
-          <div id="enhancedReasoningOptions" class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
-            <div class="flex items-start mb-3">
-              <input type="radio" id="adaptiveReasoning" name="reasoningEnhancement" value="adaptive" checked="" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
-              <label for="adaptiveReasoning" class="ml-3 block text-sm font-medium text-white">
-                Adaptive Reasoning
-                <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-900/30 text-primary-300">
-                  <span class="mr-1 w-1.5 h-1.5 rounded-full bg-primary-400"></span>
-                  Auto
-                </span>
-                <div class="text-gray-400 text-xs mt-1">Automatically increases reasoning depth for complex problems.</div>
-              </label>
-            </div>
-            
-            <div class="flex items-start">
-              <input type="radio" id="standardReasoningEnhancement" name="reasoningEnhancement" value="standard" class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
-              <label for="standardReasoningEnhancement" class="ml-3 block text-sm font-medium text-white">
-                Fixed Reasoning Depth
-                <div class="text-gray-400 text-xs mt-1">Uses the same reasoning approach for all problems regardless of complexity.</div>
-              </label>
-            </div>
-            
-            <div class="mt-4 bg-dark-700 rounded-lg p-4">
-              <div class="flex items-center text-primary-300 text-sm font-medium mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                </svg>
-                Problem Complexity Detection
-              </div>
-              <div class="text-gray-400 text-xs">
-                When adaptive reasoning is enabled, the system will automatically analyze your questions to detect:
-                <ul class="list-disc list-inside mt-2 space-y-1">
-                  <li>Mathematical expressions and calculations</li>
-                  <li>Multi-step reasoning requirements</li>
-                  <li>Logical dependencies and constraints</li>
-                  <li>Complex or abstract concepts</li>
-                </ul>
-                <p class="mt-2">For complex problems, the model will use more detailed reasoning steps even with CoD.</p>
               </div>
             </div>
           </div>
@@ -734,19 +677,7 @@
     let REASONING_METHOD = "cod"; // Options: "standard", "cot", "cod"
     
     // COD Word Limit
-    let COD_WORD_LIMIT = 5;
-    
-    // Enhanced reasoning controls
-    let ENHANCED_REASONING_ENABLED = true;
-    let REASONING_ENHANCEMENT = "adaptive"; // Options: "adaptive", "standard"
-    
-    // Problem complexity detection
-    let PROBLEM_COMPLEXITY = {
-      hasMath: false,
-      hasLogic: false,
-      multiStep: false,
-      complexity: "normal" // Options: "simple", "normal", "complex"
-    };
+    let COD_WORD_LIMIT = 10;
     
     // Prompts for different reasoning methods
     let PROMPTS = {
@@ -757,8 +688,6 @@
       cod: `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
 
 IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-If the user requests code (e.g., "write code", "python", "give me a function", etc.), use Chain of Draft for your reasoning steps, but provide the full, detailed, and well-formatted code in the final answer. Do NOT apply any word or token limit to the code or final answer. The code should be complete, correct, and ready to use.
 
 Separate your steps with periods. Write your final answer after the #### separator.
 
@@ -779,90 +708,6 @@ Q: The temperature on Monday was -3°C. On Tuesday, it was 14°C. What was the c
 A: Monday: -3°C. Tuesday: 14°C. Change: 14 - (-3) = 17°C. #### 17°C`
     };
     
-    // Enhanced prompts for complex problems with different word limits
-    let ENHANCED_PROMPTS = {
-      cot: `Think step by step to solve this problem. This appears to be a complex problem that requires careful reasoning. Break down your thinking into clear steps, making sure to consider all relevant information and constraints. 
-
-For complex problems, use as many steps as needed to work through the solution thoroughly. It's better to use more steps with clear reasoning than to skip steps.
-
-Check your calculations and logic at each step. After you've completed your reasoning process, provide your final answer.`,
-      
-      cod5: `Think step by step to solve this complex problem. For each step, use at most 5 words to capture the essential reasoning, but use AS MANY STEPS as needed to thoroughly work through the problem. Use mathematical notation where efficient. Show ALL intermediate calculations and logical inferences.
-
-IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-IMPORTANT: Instead of trying to fit complex reasoning into fewer steps, break your reasoning into more numerous simple steps. For example, instead of one step with "Calculate area using length×width=50×30=1500", use multiple steps:
-1. Length = 50.
-2. Width = 30.
-3. Area = length × width.
-4. Area = 50 × 30.
-5. Area = 1500.
-
-Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem with sufficient steps:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: speed 60 mph. First segment: time 2h. First segment: distance = 60 × 2. First segment: distance = 120 miles. Second segment: speed 75 mph. Second segment: time 1h. Second segment: distance = 75 × 1. Second segment: distance = 75 miles. Third segment: speed 50 mph. Third segment: time 0.5h. Third segment: distance = 50 × 0.5. Third segment: distance = 25 miles. Total distance: 120 + 75 + 25. Reflection: Verified all calculations and units match. Each segment's distance correctly computed. #### 220 miles`,
-      
-      cod10: `Think step by step to solve this complex problem. For each step, use up to 10 words to capture the essential reasoning. Use AS MANY STEPS as needed to fully solve the problem. Include ALL intermediate calculations and logical inferences.
-
-IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-IMPORTANT: For complex problems, it's better to use more steps with clear reasoning than to try cramming too much into each step. Break complex calculations into multiple steps.
-
-When thinking through difficult parts of a problem:
-1. Identify what information you need
-2. Think about how to derive that information
-3. Perform calculations systematically
-4. Check your work at key points
-
-Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: speed 60 mph for 2 hours. First segment distance calculation: 60 mph × 2h. First segment distance = 120 miles. Second segment: speed 75 mph for 1 hour. Second segment distance calculation: 75 mph × 1h. Second segment distance = 75 miles. Third segment: speed 50 mph for 0.5 hours. Third segment distance calculation: 50 mph × 0.5h. Third segment distance = 25 miles. Need to sum all segment distances. Total distance calculation: 120 + 75 + 25. Reflection: Verified all time periods sum correctly and speed calculations are accurate. #### 220 miles`,
-      
-      cod15: `Think step by step to solve this complex problem. For each step, use up to 15 words to capture the essential reasoning, providing more detail for critical steps. Use mathematical notation where helpful but include explanations of your approach at key points.
-
-IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: The car travels at 60 mph for 2 hours, so distance = 60 × 2 = 120 miles. Second segment: The car increases to 75 mph for 1 hour, so distance = 75 × 1 = 75 miles. Third segment: The car decreases to 50 mph for 0.5 hours, so distance = 50 × 0.5 = 25 miles. Reflection: Checked all calculations and time periods sum to 3.5 hours total. #### 220 miles`,
-      
-      cod17: `Think step by step to solve this complex problem. For each step, use up to 17 words to provide clear reasoning, especially for difficult parts. Balance precision and concision, using math notation to save words.
-
-IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: The car travels at 60 mph for 2 hours, giving distance = 60 × 2 = 120 miles. Second segment: Speed increases to 75 mph for 1 hour, so this segment's distance = 75 miles. Third segment: Speed is 50 mph for 0.5 hours, contributing 50 × 0.5 = 25 miles. Reflection: Verified all calculations and confirmed total time equals 3.5 hours. #### 220 miles`,
-      
-      cod20: `Think step by step to solve this complex problem. For each step, use up to 20 words to provide clear reasoning, explaining your approach more thoroughly for the difficult parts of the problem.
-
-IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.
-
-Separate your steps with periods. Write your final answer after the #### separator.
-
-Example of solving a complex problem:
-Q: A car travels at 60 mph. After 2 hours, it increases speed to 75 mph for 1 hour. It then decreases to 50 mph for the final 30 minutes. What is the total distance traveled?
-A: First segment: The car travels at 60 mph for 2 hours, so the distance covered in this segment is 60 × 2 = 120 miles. Second segment: The car then increases speed to 75 mph and maintains this for 1 hour, covering 75 × 1 = 75 miles. Third segment: Finally, the car decreases speed to 50 mph for 30 minutes (0.5 hours), covering 50 × 0.5 = 25 miles. Reflection: Verified all calculations are correct and time periods sum to 3.5 hours as expected. #### 220 miles`
-    };
-    
     // Default generation parameters
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
@@ -870,7 +715,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     let TOP_K = 40;
     let PRESENCE_PENALTY = 0;
     let FREQUENCY_PENALTY = 0;
-
+      
     // Initialize global self-reflection variables
     let SELF_REFLECTION_ENABLED = true;
     
@@ -888,7 +733,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       
       let displayText = MODEL_NAME_DISPLAY || "No model selected";
       
-      // Add badge for reasoning method
+      // Add badge for reasoning methods
       let badgeText = "Standard";
       let badgeClass = "bg-gray-600 text-gray-300";
       
@@ -898,12 +743,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       } else if (REASONING_METHOD === "cot") {
         badgeText = "CoT";
         badgeClass = "bg-indigo-900/60 text-indigo-400";
-      }
-      
-      // Add adaptive indicator if enabled
-      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-        badgeText = "Adaptive";
-        badgeClass = "bg-green-900/60 text-green-400";
       }
       
       // Update the display
@@ -969,7 +808,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       currentThreadId = newThread.id;
       updateThreadList();
       renderCurrentThreadMessages();
-      
       showNotification("New thread created");
     }
     
@@ -1048,7 +886,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
      * Download Functions
      ***********************/
     function parseContentForExport(content) {
-      if (!content) return []; 
+      if (!content) return [];
       
       const result = [];
       const segments = content.split(/```/);
@@ -1094,7 +932,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       
       thread.messages.forEach(msg => {
         if (msg.isPlaceholder) return;
-        
         const prefix = msg.sender.toUpperCase();
         
         let headerInfo = prefix;
@@ -1185,7 +1022,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
         doc.setTextColor(229, 231, 235);
         doc.setFont("helvetica");
         
-        // Add title
+        // Add titles
         let yPos = 40;
         doc.setFontSize(16);
         const title = thread.name || "Thread";
@@ -1273,7 +1110,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               doc.text(line, leftMargin, yPos);
               yPos += lineHeight;
             });
-            
             yPos += lineHeight;
             checkNewPage();
             
@@ -1333,12 +1169,10 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
                       checkNewPage();
                       doc.text(l, leftMargin, yPos);
                       yPos += lineHeight;
-                      checkNewPage();
                     });
                   });
-                  
-                  // Mark end of code block
                   checkNewPage();
+                  // Mark end of code block
                   doc.text(`----- CODE BLOCK END -----`, leftMargin, yPos);
                   yPos += lineHeight;
                   
@@ -1367,7 +1201,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
         // Save the PDF
         doc.save(`${thread.name || "Thread"}.pdf`);
         showNotification("PDF file downloaded");
-        
       } catch (error) {
         console.error("PDF generation error:", error);
         showNotification("Error generating PDF: " + error.message);
@@ -1397,135 +1230,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       // Split by whitespace and filter out empty strings
       const words = processedText.split(/\s+/).filter(word => word.length > 0);
       return words.length;
-    }
-    
-    /***********************
-     * Problem Complexity Analysis
-     ***********************/
-    function analyzeProblemComplexity(message) {
-      // Reset current complexity
-      PROBLEM_COMPLEXITY = {
-        hasMath: false,
-        hasLogic: false,
-        multiStep: false,
-        complexity: "normal",
-        wordCount: message.split(/\s+/).length,
-        estimatedSteps: 0
-      };
-      
-      // Mathematical expressions patterns
-      const mathPatterns = [
-        /[0-9\s][\+\-\*\/\=\(\)][0-9\s]/,  // Basic operations
-        /\d+\s*\^\s*\d+/,                  // Powers
-        /\d+\s*\/\s*\d+/,                  // Fractions
-        /(?:sin|cos|tan|log|ln|sqrt|exp)/i, // Math functions
-        /\[\s*[^\]]+\s*\]/,                // Matrix notation
-        /\{\s*[^\}]+\s*\}/,                // Set notation
-        /[\+\-]\s*[\d\.]+[eE][\+\-]\d+/,   // Scientific notation
-        /\d+\s*%/,                         // Percentages
-      ];
-      
-      // Logical expressions patterns
-      const logicPatterns = [
-        /(?:if|then|else|therefore|because|implies|since|hence|thus|consequently)/i,
-        /(?:and|or|not|xor|nor|all|some|every|any|none)/i,
-        /(?:true|false|valid|invalid|prove|QED|contradiction|logical|premise|conclusion)/i,
-      ];
-      
-      // Multi-step problem indicators
-      const multiStepPatterns = [
-        /(?:first|second|third|next|then|after|finally|lastly|step|phase)/i,
-        /(?:find the total|calculate the|determine the|solve for)/i,
-        /(?:per month|per year|initially|eventually|ultimately|before|after)/i,
-        /(?:increases by|decreases by|changes by|grows|reduces)/i,
-      ];
-      
-      // Check for math patterns
-      for (const pattern of mathPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.hasMath = true;
-          break;
-        }
-      }
-      
-      // Check for logic patterns
-      for (const pattern of logicPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.hasLogic = true;
-          break;
-        }
-      }
-      
-      // Check for multi-step patterns
-      for (const pattern of multiStepPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.multiStep = true;
-          break;
-        }
-      }
-      
-      // Determine complexity
-      let complexityScore = 0;
-      if (PROBLEM_COMPLEXITY.hasMath) complexityScore += 1;
-      if (PROBLEM_COMPLEXITY.hasLogic) complexityScore += 1;
-      if (PROBLEM_COMPLEXITY.multiStep) complexityScore += 1;
-      
-      // Apply more specific pattern checks
-      
-      // Advanced math indicators
-      if (/(?:calculus|differential|integral|equation system|probability|statistics|algebra|geometry)/i.test(message)) {
-        complexityScore += 1;
-      }
-      
-      // Long problems are often complex
-      if (message.length > 500) {
-        complexityScore += 1;
-      }
-      
-      // Multiple constraints or variables
-      if (message.match(/(?:constraint|variable|unknown|factor|parameter|condition)/gi)?.length > 2) {
-        complexityScore += 1;
-      }
-      
-      // Update complexity level
-      if (complexityScore >= 3) {
-        PROBLEM_COMPLEXITY.complexity = "complex";
-        // Estimate number of steps needed
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          5, 
-          Math.min(20, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 15))
-        );
-      } else if (complexityScore >= 1) {
-        PROBLEM_COMPLEXITY.complexity = "normal";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          3, 
-          Math.min(10, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 20))
-        );
-      } else {
-        PROBLEM_COMPLEXITY.complexity = "simple";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          2, 
-          Math.min(5, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 25))
-        );
-      }
-      
-      // Adjust estimated steps based on problem characteristics
-      if (PROBLEM_COMPLEXITY.hasMath && PROBLEM_COMPLEXITY.multiStep) {
-        PROBLEM_COMPLEXITY.estimatedSteps += 2;
-      }
-      
-      if (PROBLEM_COMPLEXITY.hasLogic) {
-        PROBLEM_COMPLEXITY.estimatedSteps += 1;
-      }
-      
-      // If the problem has math expressions, ensure minimum steps
-      if (PROBLEM_COMPLEXITY.hasMath) {
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(PROBLEM_COMPLEXITY.estimatedSteps, 4);
-      }
-      
-      console.log(`Problem analysis: ${JSON.stringify(PROBLEM_COMPLEXITY)}`);
-      
-      return PROBLEM_COMPLEXITY;
     }
     
     /***********************
@@ -1586,13 +1290,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           let thinking = content.substring(0, separatorIndex).trim();
           let answer = content.substring(separatorIndex + 4).trim();
           
-          // If answer contains code block markers, ensure all code blocks are closed
-          const codeBlockStartCount = (answer.match(/```/g) || []).length;
-          if (codeBlockStartCount % 2 !== 0) {
-            // If odd, add closing ```
-            answer += "\n```";
-          }
-          
           // Check for reflection step
           const reflectionPatterns = [
             /reflection:/i,
@@ -1639,8 +1336,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       if (reasoningMethod === "cot") {
         // Look for potential conclusion markers
         const conclusionMarkers = [
-          "Therefore", "In conclusion", "So,", "Thus,", "Hence,", 
-          "The answer is", "To conclude", "Finally,", "In summary",
+          "Therefore", "In conclusion", "So,", "Thus,", "Hence,", "The answer is", "To conclude", "Finally,", "In summary",
           "As a result", "Consequently", "The final answer"
         ];
         
@@ -1720,7 +1416,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       if (reasoningMethod === "standard") {
         return {
           content: content,
-          thinking: null, 
+          thinking: null,
           answer: content,
           thinkingWordCount: 0,
           answerWordCount: countWords(content)
@@ -1757,7 +1453,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
             const isReflection = /reflection:|reflecting:|let's verify:|verifying:|checking work:|self-check:/i.test(step);
             let stepContent = step.trim();
             if (!isReflection && !stepContent.endsWith('.')) stepContent += '.';
-
+            
             if (isReflection) {
               return `<li class="mb-6 ml-2">
                 <span class="absolute -left-5 flex items-center justify-center w-8 h-8 bg-indigo-700/70 rounded-full border-2 border-indigo-400 text-indigo-200 font-bold shadow-lg">🔍</span>
@@ -1867,7 +1563,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
                 </svg>
                 ${msg.content}
               </div>`;
-            } 
+            }
             // Handle streaming messages
             else if (msg.isStreaming) {
               msgContent.classList.add("streaming");
@@ -1890,7 +1586,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               // Format thinking steps
               const thinkingContent = document.createElement("div");
               thinkingContent.innerHTML = formatThinkingSteps(
-                msg.thinking, 
+                msg.thinking,
                 msg.reasoningMethod ? msg.reasoningMethod.toLowerCase() : REASONING_METHOD
               );
               thinkingContainer.appendChild(thinkingContent);
@@ -1995,8 +1691,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           answerWordCount: sender === "bot" && !isPlaceholder ? answerWordCount : undefined,
           // Add files to the message
           files: files && files.length > 0 ? files : undefined,
-          // Add complexity info for debugging
-          complexityInfo: sender === "user" ? PROBLEM_COMPLEXITY : undefined
         });
         
         renderCurrentThreadMessages();
@@ -2015,102 +1709,32 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       
       let systemPrompt = "";
       
-      // Use enhanced reasoning for complex problems if enabled
-      let shouldUseEnhancedPrompt = false;
-      let problemType = "";
-      
-      // Determine if this is a complex problem that needs enhanced reasoning
-      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-        if (PROBLEM_COMPLEXITY.complexity === "complex") {
-          shouldUseEnhancedPrompt = true;
-          problemType = "complex";
-          console.log("Using enhanced prompts for complex problem detected");
-        } 
-        else if (PROBLEM_COMPLEXITY.hasMath && (PROBLEM_COMPLEXITY.multiStep || PROBLEM_COMPLEXITY.hasLogic)) {
-          shouldUseEnhancedPrompt = true;
-          problemType = "mathematical";
-          console.log("Using enhanced prompts for mathematical problem detected");
-        }
-      }
-      
       // If we have a reasoning method other than standard, add the system prompt
       if (REASONING_METHOD !== "standard") {
         // Determine which prompt to use based on complexity and settings
-        if (shouldUseEnhancedPrompt) {
-          if (REASONING_METHOD === "cot") {
-            systemPrompt = ENHANCED_PROMPTS.cot;
-          } else if (REASONING_METHOD === "cod") {
-            // Use the appropriate CoD prompt based on word limit
-            if (COD_WORD_LIMIT === 5) {
-              systemPrompt = ENHANCED_PROMPTS.cod5;
-              if (!SELF_REFLECTION_ENABLED) {
-                systemPrompt = systemPrompt.replace(/Before providing your final answer, add a reflection step.*?errors\.(\r?\n|\r)/g, '');
-              }
-            } else if (COD_WORD_LIMIT === 10) {
-              systemPrompt = ENHANCED_PROMPTS.cod10;
-              if (!SELF_REFLECTION_ENABLED) {
-                systemPrompt = systemPrompt.replace(/Before providing your final answer, add a reflection step.*?errors\.(\r?\n|\r)/g, '');
-              }
-            } else if (COD_WORD_LIMIT === 15) {
-              systemPrompt = ENHANCED_PROMPTS.cod15;
-              if (!SELF_REFLECTION_ENABLED) {
-                systemPrompt = systemPrompt.replace(/Before providing your final answer, add a reflection step.*?errors\.(\r?\n|\r)/g, '');
-              }
-            } else if (COD_WORD_LIMIT === 17) {
-              systemPrompt = ENHANCED_PROMPTS.cod17;
-              if (!SELF_REFLECTION_ENABLED) {
-                systemPrompt = systemPrompt.replace(/Before providing your final answer, add a reflection step.*?errors\.(\r?\n|\r)/g, '');
-              }
-            } else if (COD_WORD_LIMIT === 20) {
-              systemPrompt = ENHANCED_PROMPTS.cod20;
-              if (!SELF_REFLECTION_ENABLED) {
-                systemPrompt = systemPrompt.replace(/Before providing your final answer, add a reflection step.*?errors\.(\r?\n|\r)/g, '');
+        if (REASONING_METHOD === "cod") {
+          // First update the word limit
+          systemPrompt = PROMPTS.cod.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
+          
+          // If self-reflection is enabled but not in the prompt, add it
+          if (SELF_REFLECTION_ENABLED && !systemPrompt.includes("add a reflection step")) {
+            const reflectionInstruction = "\n\nBefore providing your final answer, add a reflection step starting with \"Reflection:\" to verify your work and catch any potential errors.";
+            // Find a good place to insert - after the first paragraph but before examples
+            const firstParagraphEnd = systemPrompt.indexOf("\n\n");
+            if (firstParagraphEnd !== -1) {
+              const examplesStart = systemPrompt.indexOf("Examples:");
+              if (examplesStart !== -1 && examplesStart > firstParagraphEnd) {
+                systemPrompt = systemPrompt.substring(0, examplesStart) + reflectionInstruction + "\n\n" + systemPrompt.substring(examplesStart);
+              } else {
+                systemPrompt = systemPrompt.substring(0, firstParagraphEnd + 2) + reflectionInstruction + systemPrompt.substring(firstParagraphEnd + 2);
               }
             } else {
-              // Fallback to standard prompt but update word limit
-              systemPrompt = PROMPTS[REASONING_METHOD].replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
+              systemPrompt += reflectionInstruction;
             }
           }
         } else {
           // Use the selected reasoning method prompt
           systemPrompt = PROMPTS[REASONING_METHOD];
-          
-          // If it's COD, update the word limit
-          if (REASONING_METHOD === "cod") {
-            // First update the word limit
-            systemPrompt = systemPrompt.replace(/\(\d+ words maximum per step\)/, `(${COD_WORD_LIMIT} words maximum per step)`);
-            
-            // If self-reflection is enabled but not in the prompt, add it
-            if (SELF_REFLECTION_ENABLED && !systemPrompt.includes("add a reflection step")) {
-              const reflectionInstruction = "\n\nBefore providing your final answer, add a reflection step starting with \"Reflection:\" to verify your work and catch any potential errors.";
-              // Find a good place to insert - after the first paragraph but before examples
-              const firstParagraphEnd = systemPrompt.indexOf("\n\n");
-              if (firstParagraphEnd !== -1) {
-                const examplesStart = systemPrompt.indexOf("Examples:");
-                if (examplesStart !== -1 && examplesStart > firstParagraphEnd) {
-                  systemPrompt = systemPrompt.substring(0, examplesStart) + reflectionInstruction + "\n\n" + systemPrompt.substring(examplesStart);
-                } else {
-                  systemPrompt = systemPrompt.substring(0, firstParagraphEnd + 2) + reflectionInstruction + systemPrompt.substring(firstParagraphEnd + 2);
-                }
-              } else {
-                systemPrompt += reflectionInstruction;
-              }
-            }
-            
-            // If this is a problem that needs many steps, add instructions to use more steps
-            if (PROBLEM_COMPLEXITY.estimatedSteps > 5) {
-              // Insert guidance about using sufficient steps after the first paragraph
-              const firstParagraphEnd = systemPrompt.indexOf("\n\n");
-              if (firstParagraphEnd !== -1) {
-                const beforeInsert = systemPrompt.substring(0, firstParagraphEnd);
-                const afterInsert = systemPrompt.substring(firstParagraphEnd);
-                
-                const insertText = `\n\nIMPORTANT: This problem may require ${PROBLEM_COMPLEXITY.estimatedSteps}+ reasoning steps. Use as many steps as needed to fully solve the problem - it's better to break complex reasoning into more simple steps than to skip important details.`;
-                
-                systemPrompt = beforeInsert + insertText + afterInsert;
-              }
-            }
-          }
         }
         
         let reasoningInfo = `${REASONING_METHOD.toUpperCase()}`;
@@ -2121,12 +1745,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
           }
         }
         
-        if (shouldUseEnhancedPrompt) {
-          reasoningInfo += " (Enhanced for complex problem)";
-        }
-        
         console.log(`Using ${reasoningInfo} prompt`);
-        
         if (wordCountRequest) {
           console.log(`Added instruction for ${wordCountRequest} word limit on final answer only`);
         }
@@ -2247,11 +1866,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
       
       // Check if Web Search is enabled
       const useWebSearch = localStorage.getItem('webSearchEnabled') === 'true';
-      
-      // Analyze problem complexity if enhanced reasoning is enabled
-      if (ENHANCED_REASONING_ENABLED && REASONING_ENHANCEMENT === "adaptive") {
-        analyzeProblemComplexity(message);
-      }
       
       // Process files for sending to the API
       const supportsMultimodal = doesModelSupportMultimodal(MODEL_NAME);
@@ -2527,13 +2141,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               reasoningInfo += `-${COD_WORD_LIMIT}`;
             }
             
-            // Add enhanced reasoning info if used
-            if (ENHANCED_REASONING_ENABLED && 
-                REASONING_ENHANCEMENT === "adaptive" && 
-                PROBLEM_COMPLEXITY.complexity === "complex") {
-              reasoningInfo += "-ENHANCED";
-            }
-            
             // Process bot message to separate thinking and answer parts
             const processed = processBotMessage(fullResponse, REASONING_METHOD);
             
@@ -2553,7 +2160,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
             };
             
             renderCurrentThreadMessages();
-            
           } catch (streamingError) {
             console.error("Streaming error:", streamingError);
             
@@ -2582,9 +2188,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
             // First try: Send request to the Edge Function endpoint
             const response = await fetch(`${EDGE_API_URL}${cacheBuster}`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
               signal: controller.signal
             });
@@ -2609,13 +2213,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
                   reasoningInfo += `-${COD_WORD_LIMIT}`;
                 }
                 
-                // Add enhanced reasoning info if used
-                if (ENHANCED_REASONING_ENABLED && 
-                    REASONING_ENHANCEMENT === "adaptive" && 
-                    PROBLEM_COMPLEXITY.complexity === "complex") {
-                  reasoningInfo += "-ENHANCED";
-                }
-                
                 // Process bot message to separate thinking and answer parts
                 const processed = processBotMessage(trimmedReply, REASONING_METHOD);
                 
@@ -2631,6 +2228,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
                   thinkingWordCount: processed.thinkingWordCount || 0,
                   answerWordCount: processed.answerWordCount || 0
                 };
+                
                 renderCurrentThreadMessages();
                 
                 // Re-enable streaming for next message
@@ -2650,7 +2248,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               } catch (e) {
                 console.error("Failed to parse error response:", e);
               }
-              
               throw new Error(`Edge Function returned status: ${response.status} - ${errorText}`);
             }
           } catch (edgeError) {
@@ -2671,9 +2268,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               // Try the fallback serverless function
               const fallbackResponse = await fetch(`${FALLBACK_API_URL}${cacheBuster}`, {
                 method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   ...payload,
                   max_tokens: Math.min(8192, adjustedMaxTokens) // Ensure within model limits
@@ -2706,9 +2301,9 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
               // Process the fallback response
               const fallbackData = await fallbackResponse.json();
               const botReply = fallbackData.choices &&
-                            fallbackData.choices[0] &&
-                            fallbackData.choices[0].message &&
-                            fallbackData.choices[0].message.content;
+                              fallbackData.choices[0] &&
+                              fallbackData.choices[0].message &&
+                              fallbackData.choices[0].message.content;
               
               if (botReply) {
                 const trimmedReply = botReply.trim() + "\n\n*Note: This response was generated using the fallback API endpoint.*";
@@ -2717,13 +2312,6 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
                 let reasoningInfo = REASONING_METHOD.toUpperCase();
                 if (REASONING_METHOD === "cod") {
                   reasoningInfo += `-${COD_WORD_LIMIT}`;
-                }
-                
-                // Add enhanced reasoning info if used
-                if (ENHANCED_REASONING_ENABLED && 
-                    REASONING_ENHANCEMENT === "adaptive" && 
-                    PROBLEM_COMPLEXITY.complexity === "complex") {
-                  reasoningInfo += "-ENHANCED";
                 }
                 
                 // Process bot message to separate thinking and answer parts
@@ -2741,6 +2329,7 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
                   thinkingWordCount: processed.thinkingWordCount || 0,
                   answerWordCount: processed.answerWordCount || 0
                 };
+                
                 renderCurrentThreadMessages();
                 
                 // Re-enable streaming for next message
@@ -3373,18 +2962,12 @@ A: First segment: The car travels at 60 mph for 2 hours, so the distance covered
     function updateCoDPrompt() {
       // Update the prompt to reflect new word limit
       const basePrompt = `Think step by step, but produce only minimal notes for each step (${COD_WORD_LIMIT} words maximum per step). Use mathematical notation where possible. Keep only essential information needed to solve the problem. Focus on key calculations and intermediate results without narrative explanation.
-
-IMPORTANT: The word limit applies only to the reasoning steps. The final answer (including code or explanations) should be as detailed as needed and is NOT limited by the step word constraint.
-
-If the user requests code (e.g., "write code", "python", "give me a function", etc.), use Chain of Draft for your reasoning steps, but provide the full, detailed, and well-formatted code in the final answer. Do NOT apply any word or token limit to the code or final answer. The code should be complete, correct, and ready to use.
-
+  
 Separate your steps with periods. Write your final answer after the #### separator.`;
       
       // Add self-reflection instruction if enabled
       const basePromptWithReflection = SELF_REFLECTION_ENABLED ? 
-        basePrompt + `
-
-Before providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.` : 
+        basePrompt + `\n\nBefore providing your final answer, add a reflection step starting with "Reflection:" to verify your work and catch any potential errors.` : 
         basePrompt;
       
       // Keep the examples part of the prompt
@@ -3399,64 +2982,10 @@ Before providing your final answer, add a reflection step starting with "Reflect
       console.log(`Updated CoD prompt with word limit: ${COD_WORD_LIMIT}, self-reflection: ${SELF_REFLECTION_ENABLED}`);
     }
     
-    // Setup Enhanced Reasoning options
-    function setupEnhancedReasoningOptions() {
-      const enhancedToggle = document.getElementById('enhancedReasoningToggle');
-      const optionsContainer = document.getElementById('enhancedReasoningOptions');
-      const adaptiveRadio = document.getElementById('adaptiveReasoning');
-      const standardRadio = document.getElementById('standardReasoningEnhancement');
-      
-      // Initialize state
-      if (enhancedToggle) {
-        enhancedToggle.checked = ENHANCED_REASONING_ENABLED;
-        if (optionsContainer) {
-          optionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
-        }
-      }
-      
-      if (adaptiveRadio && standardRadio) {
-        if (REASONING_ENHANCEMENT === 'adaptive') {
-          adaptiveRadio.checked = true;
-        } else {
-          standardRadio.checked = true;
-        }
-      }
-      
-      // Add event listeners
-      if (enhancedToggle) {
-        enhancedToggle.addEventListener('change', () => {
-          ENHANCED_REASONING_ENABLED = enhancedToggle.checked;
-          if (optionsContainer) {
-            optionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
-          }
-          updateCurrentModelDisplay();
-        });
-      }
-      
-      if (adaptiveRadio) {
-        adaptiveRadio.addEventListener('change', () => {
-          if (adaptiveRadio.checked) {
-            REASONING_ENHANCEMENT = 'adaptive';
-            updateCurrentModelDisplay();
-          }
-        });
-      }
-      
-      if (standardRadio) {
-        standardRadio.addEventListener('change', () => {
-          if (standardRadio.checked) {
-            REASONING_ENHANCEMENT = 'standard';
-            updateCurrentModelDisplay();
-          }
-        });
-      }
-    }
-    
     // Setup COD options display
     function setupCODOptions() {
       const reasoningRadios = document.getElementsByName('reasoningMethod');
       const codOptions = document.getElementById('codOptions');
-      
       if (!codOptions) return;
       
       // Initial state
@@ -3525,30 +3054,9 @@ Before providing your final answer, add a reflection step starting with "Reflect
         console.log("Opening settings modal");
         
         // Initialize settings UI
-        
         // Set reasoning method radio buttons
         const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`);
         if (reasoningRadio) reasoningRadio.checked = true;
-        
-        // Set enhanced reasoning options
-        const enhancedToggle = document.getElementById('enhancedReasoningToggle');
-        if (enhancedToggle) enhancedToggle.checked = ENHANCED_REASONING_ENABLED;
-        
-        const enhancedOptionsContainer = document.getElementById('enhancedReasoningOptions');
-        if (enhancedOptionsContainer) {
-          enhancedOptionsContainer.style.display = ENHANCED_REASONING_ENABLED ? 'block' : 'none';
-        }
-        
-        const adaptiveRadio = document.getElementById('adaptiveReasoning');
-        const standardRadio = document.getElementById('standardReasoningEnhancement');
-        
-        if (adaptiveRadio && standardRadio) {
-          if (REASONING_ENHANCEMENT === 'adaptive') {
-            adaptiveRadio.checked = true;
-          } else {
-            standardRadio.checked = true;
-          }
-        }
         
         // Set parameter sliders
         setSliderAndValue("temp", TEMPERATURE);
@@ -3638,8 +3146,6 @@ Before providing your final answer, add a reflection step starting with "Reflect
         // Save previous settings for comparison
         const prevMethod = REASONING_METHOD;
         const prevWordLimit = COD_WORD_LIMIT;
-        const prevEnhanced = ENHANCED_REASONING_ENABLED;
-        const prevEnhancementType = REASONING_ENHANCEMENT;
         
         // Get streaming setting
         const streamingToggle = document.getElementById('streamingToggle');
@@ -3697,29 +3203,6 @@ Before providing your final answer, add a reflection step starting with "Reflect
           } catch (codErr) {
             console.error("Error getting COD word limit:", codErr);
           }
-        }
-        
-        // Save enhanced reasoning settings
-        try {
-          const enhancedToggle = document.getElementById('enhancedReasoningToggle');
-          if (enhancedToggle) {
-            ENHANCED_REASONING_ENABLED = enhancedToggle.checked;
-            console.log("Enhanced reasoning enabled:", ENHANCED_REASONING_ENABLED);
-          }
-          
-          const adaptiveRadio = document.getElementById('adaptiveReasoning');
-          const standardRadio = document.getElementById('standardReasoningEnhancement');
-          
-          if (adaptiveRadio && standardRadio) {
-            if (adaptiveRadio.checked) {
-              REASONING_ENHANCEMENT = 'adaptive';
-            } else if (standardRadio.checked) {
-              REASONING_ENHANCEMENT = 'standard';
-            }
-            console.log("Reasoning enhancement:", REASONING_ENHANCEMENT);
-          }
-        } catch (enhancedErr) {
-          console.error("Error getting enhanced reasoning settings:", enhancedErr);
         }
         
         // Save self-reflection settings
@@ -3786,8 +3269,6 @@ Before providing your final answer, add a reflection step starting with "Reflect
           localStorage.setItem("modelName", MODEL_NAME);
           localStorage.setItem("reasoningMethod", REASONING_METHOD);
           localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
-          localStorage.setItem("enhancedReasoningEnabled", ENHANCED_REASONING_ENABLED.toString());
-          localStorage.setItem("reasoningEnhancement", REASONING_ENHANCEMENT);
           localStorage.setItem("temperature", TEMPERATURE.toString());
           localStorage.setItem("topP", TOP_P.toString());
           localStorage.setItem("topK", TOP_K.toString());
@@ -3798,7 +3279,6 @@ Before providing your final answer, add a reflection step starting with "Reflect
           
           // Save custom prompts
           localStorage.setItem("customPrompts", JSON.stringify(PROMPTS));
-          localStorage.setItem("enhancedPrompts", JSON.stringify(ENHANCED_PROMPTS));
           console.log("Settings saved to localStorage");
         } catch (storageErr) {
           console.error("Error saving to localStorage:", storageErr);
@@ -3811,9 +3291,7 @@ Before providing your final answer, add a reflection step starting with "Reflect
         
         // Show appropriate notification
         if (prevMethod !== REASONING_METHOD || 
-            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT) ||
-            prevEnhanced !== ENHANCED_REASONING_ENABLED ||
-            prevEnhancementType !== REASONING_ENHANCEMENT) {
+            (REASONING_METHOD === "cod" && prevMethod === "cod" && prevWordLimit !== COD_WORD_LIMIT)) {
           showNotification("Settings saved - reasoning method changed");
         } else {
           showNotification("Settings saved");
@@ -3969,22 +3447,10 @@ Before providing your final answer, add a reflection step starting with "Reflect
       try {
         MODEL_NAME = localStorage.getItem("modelName") || "";
         MODEL_NAME_DISPLAY = getModelDisplayName(MODEL_NAME);
-        
         REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
         
         const codWordLimit = localStorage.getItem("codWordLimit");
         if (codWordLimit) COD_WORD_LIMIT = parseInt(codWordLimit);
-        
-        // Load enhanced reasoning settings
-        const enhancedEnabled = localStorage.getItem("enhancedReasoningEnabled");
-        if (enhancedEnabled !== null) {
-          ENHANCED_REASONING_ENABLED = enhancedEnabled === "true";
-        }
-        
-        const enhancementType = localStorage.getItem("reasoningEnhancement");
-        if (enhancementType) {
-          REASONING_ENHANCEMENT = enhancementType;
-        }
         
         // Load custom prompts if available
         const storedPrompts = localStorage.getItem("customPrompts");
@@ -3992,14 +3458,6 @@ Before providing your final answer, add a reflection step starting with "Reflect
           const parsedPrompts = JSON.parse(storedPrompts);
           // Merge with default prompts to ensure all properties exist
           PROMPTS = { ...PROMPTS, ...parsedPrompts };
-        }
-        
-        // Load enhanced prompts if available
-        const storedEnhancedPrompts = localStorage.getItem("enhancedPrompts");
-        if (storedEnhancedPrompts) {
-          const parsedEnhancedPrompts = JSON.parse(storedEnhancedPrompts);
-          // Merge with default prompts to ensure all properties exist
-          ENHANCED_PROMPTS = { ...ENHANCED_PROMPTS, ...parsedEnhancedPrompts };
         }
         
         const temp = localStorage.getItem("temperature");
@@ -4108,16 +3566,48 @@ Before providing your final answer, add a reflection step starting with "Reflect
       try {
         console.log("Initializing event listeners");
         
+        // Direct button binding for critical buttons
+        const sendBtn = document.getElementById('sendBtn');
+        if (sendBtn) {
+          console.log("Found send button, adding direct click handler");
+          sendBtn.onclick = function() {
+            console.log("Send button clicked");
+            const textarea = document.getElementById('userInput');
+            if (textarea) {
+              const message = textarea.value.trim();
+              if (message || attachedFiles.length > 0) {
+                sendMessage(message);
+                textarea.value = '';
+                textarea.style.height = 'auto';
+              }
+            }
+          };
+        } else {
+          console.error("Send button not found!");
+        }
+        
         // Helper function to safely add event listeners
         const addListener = (id, event, handler) => {
           const element = document.getElementById(id);
           if (element) {
+            console.log(`Adding ${event} listener to ${id}`);
             element.addEventListener(event, handler);
+            
+            // For click events, add an immediate visual feedback
+            if (event === 'click') {
+              element.addEventListener('mousedown', function() {
+                this.style.transform = 'scale(0.95)';
+              });
+              element.addEventListener('mouseup', function() {
+                this.style.transform = 'scale(1)';
+              });
+            }
           } else {
             console.warn(`Element with id "${id}" not found for event listener`);
           }
         };
-        
+
+        // Rest of the event listeners
         // Settings buttons
         addListener("openSettings", "click", openSettingsModal);
         addListener("closeSettings", "click", closeSettingsModal);
@@ -4195,7 +3685,6 @@ Before providing your final answer, add a reflection step starting with "Reflect
             setupTabNavigation();
             setupModelInput();
             setupCODOptions();
-            setupEnhancedReasoningOptions();
             setupSliders();
             initSelfReflection();
             console.log("UI functionality setup complete");
@@ -4208,10 +3697,38 @@ Before providing your final answer, add a reflection step starting with "Reflect
       }
     }
     
+    /***********************
+     * Click Handler Testing
+     ***********************/
+    function testClickHandlers() {
+      // Get all clickable elements
+      const clickables = document.querySelectorAll('button, .cod-word-limit-option, .tab-btn');
+      
+      // Add a test click handler to verify event binding
+      clickables.forEach(el => {
+        const originalBg = window.getComputedStyle(el).backgroundColor;
+        
+        // Add a temporary click effect to visualize clicks
+        el.addEventListener('click', function(e) {
+          console.log('Click registered on:', this.id || this.className);
+          this.style.backgroundColor = 'rgba(86, 134, 245, 0.5)';
+          setTimeout(() => {
+            this.style.backgroundColor = originalBg;
+          }, 300);
+        }, true);
+      });
+      
+      console.log('Added test click handlers to', clickables.length, 'elements');
+      showNotification('Click testing enabled - check console');
+    }
+
     // Initialize the application
     document.addEventListener("DOMContentLoaded", async function() {
       try {
         console.log("Starting application initialization...");
+        
+        // Test click handlers - uncomment this line to debug click issues
+        // testClickHandlers();
         
         // Dark mode detection
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -4235,13 +3752,70 @@ Before providing your final answer, add a reflection step starting with "Reflect
           webSearchBtn.classList.add('bg-primary-500', 'text-white');
           webSearchBtn.classList.remove('bg-dark-500', 'text-gray-300');
         }
-        
+
+        // Ensure all buttons have proper click handlers - fallback approach
+        setTimeout(() => {
+          console.log("Adding fallback click handlers to critical buttons");
+          // Critical buttons - direct click bindings
+          const criticalButtonIds = [
+            'sendBtn', 'openSettings', 'saveSettings', 'newThreadBtn', 
+            'deleteThreadBtn', 'clearThreadBtn', 'webSearchBtn'
+          ];
+          
+          criticalButtonIds.forEach(id => {
+            const button = document.getElementById(id);
+            if (button) {
+              console.log(`Setting up click handler for ${id}`);
+              // Force replacing with a fresh element to clear any issues
+              const newButton = button.cloneNode(true);
+              button.parentNode.replaceChild(newButton, button);
+              
+              // Re-attach event handler
+              if (id === 'sendBtn') {
+                newButton.addEventListener('click', () => {
+                  console.log("Send button clicked");
+                  const textarea = document.getElementById('userInput');
+                  if (textarea) {
+                    const message = textarea.value.trim();
+                    if (message || attachedFiles.length > 0) {
+                      sendMessage(message);
+                      textarea.value = '';
+                      textarea.style.height = 'auto';
+                    }
+                  }
+                });
+              } else if (id === 'openSettings') {
+                newButton.addEventListener('click', openSettingsModal);
+              } else if (id === 'saveSettings') {
+                newButton.addEventListener('click', saveSettings);
+              } else if (id === 'newThreadBtn') {
+                newButton.addEventListener('click', createNewThread);
+              } else if (id === 'deleteThreadBtn') {
+                newButton.addEventListener('click', deleteCurrentThread);
+              } else if (id === 'clearThreadBtn') {
+                newButton.addEventListener('click', () => {
+                  if (confirm("Clear all messages in this thread?")) {
+                    const thread = threads.find(t => t.id === currentThreadId);
+                    if (thread) {
+                      thread.messages = [];
+                      renderCurrentThreadMessages();
+                      showNotification("Thread cleared");
+                    }
+                  }
+                });
+              } else if (id === 'webSearchBtn') {
+                newButton.addEventListener('click', toggleWebSearch);
+              }
+            } else {
+              console.warn(`Critical button ${id} not found in DOM!`);
+            }
+          });
+        }, 1000);
       } catch (error) {
         console.error("Error during application initialization:", error);
         showNotification("Error initializing application. Please refresh the page.");
       }
     });
   </script>
-
 
 </body></html>
