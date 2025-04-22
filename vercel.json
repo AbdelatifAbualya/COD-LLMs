@@ -7,7 +7,8 @@
     { "src": "api/proxy.js", "use": "@vercel/node" },
     { "src": "api/streaming.js", "use": "@vercel/node" },
     { "src": "api/rag.js", "use": "@vercel/node" },
-    { "src": "api/mongodb-status.js", "use": "@vercel/node" }
+    { "src": "api/mongodb-status.js", "use": "@vercel/node" },
+    { "src": "api/abacus-research.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/perplexity", "dest": "/api/perplexity.js" },
@@ -15,6 +16,7 @@
     { "src": "/api/proxy", "dest": "/api/proxy.js" },
     { "src": "/api/rag", "dest": "/api/rag.js" },
     { "src": "/api/mongodb-status", "dest": "/api/mongodb-status.js" },
+    { "src": "/api/abacus-research", "dest": "/api/abacus-research.js" },
     { "src": "/api/(.*)", "dest": "/api/api-proxy.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
