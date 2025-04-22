@@ -1,5 +1,4 @@
-
-<!DOCTYPE html><html lang="en" class="dark"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html><html lang="en" class="dark"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://api.abacus.ai; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reasoning Studio - CoT vs CoD</title>
@@ -297,10 +296,52 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
+            <button id="researchBtn" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2 rounded-lg transition" title="Research papers on this topic">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </button>
           </div>
         </div>
         <input type="file" id="fileInput" class="hidden" multiple="">
         <div id="attachedFiles" class="mt-3 flex flex-wrap gap-3 hidden"></div>
+      </div>
+      
+      <!-- Research Modal -->
+      <div id="researchModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-dark-700 rounded-xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="p-5 border-b border-dark-600 flex justify-between items-center">
+            <h2 class="text-xl font-semibold">Research Papers</h2>
+            <button id="closeResearchModal" class="text-gray-400 hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="p-5">
+            <label for="researchSubject" class="block text-sm font-medium text-gray-300 mb-2">Research Topic:</label>
+            <input type="text" id="researchSubject" class="w-full bg-dark-600 border border-dark-500 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4" placeholder="Enter research subject (e.g., quantum computing)">
+            
+            <div id="researchStatus" class="hidden mb-4 p-3 bg-dark-600 rounded-lg text-center">
+              <div class="flex justify-center items-center">
+                <svg class="animate-spin h-5 w-5 text-primary-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Searching for research papers...</span>
+              </div>
+            </div>
+            
+            <button id="executeResearchBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white py-3 px-4 rounded-lg transition mt-2">
+              Search for Papers
+            </button>
+            
+            <button id="addToConversationBtn" class="w-full bg-dark-500 hover:bg-dark-400 text-gray-300 py-3 px-4 rounded-lg transition mt-2 hidden">
+              Add Research to Conversation
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -664,10 +705,13 @@
     let MODEL_NAME = "";
     let MODEL_NAME_DISPLAY = "";
     let enableWebSearch = false;
+    let enableResearch = false;
+    let currentResearchResults = null;
     
     // API endpoints - primary and fallback
     const EDGE_API_URL = "/api/proxy";
     const FALLBACK_API_URL = "/api-fallback/proxy";
+    const RESEARCH_API_URL = "/api/abacus-research";
     // Keep the original for backward compatibility
     const API_PROXY_URL = EDGE_API_URL;
     
@@ -3470,6 +3514,12 @@ Separate your steps with periods. Write your final answer after the #### separat
         if (webSearchEnabled !== null) {
           enableWebSearch = webSearchEnabled === 'true';
         }
+        
+        // Load research preference
+        const researchEnabled = localStorage.getItem('researchEnabled');
+        if (researchEnabled !== null) {
+          enableResearch = researchEnabled === 'true';
+        }
       } catch (err) {
         console.error("Error loading settings:", err);
       }
@@ -3652,6 +3702,11 @@ Separate your steps with periods. Write your final answer after the #### separat
           if (feedbackModal && event.target === feedbackModal) {
             feedbackModal.style.display = 'none';
           }
+          
+          const researchModal = document.getElementById("researchModal");
+          if (researchModal && event.target === researchModal) {
+            closeResearchModal();
+          }
         });
         
         // Set up settings UI functionality
@@ -3667,8 +3722,164 @@ Separate your steps with periods. Write your final answer after the #### separat
             console.error("Error setting up UI functionality:", err);
           }
         }, 100);
+        
+        // Research button
+        addListener("researchBtn", "click", toggleResearch);
+        addListener("closeResearchModal", "click", closeResearchModal);
+        addListener("executeResearchBtn", "click", executeResearch);
+        addListener("addToConversationBtn", "click", addResearchToConversation);
       } catch (err) {
         console.error("Error initializing event listeners:", err);
+      }
+    }
+    
+    /***********************
+     * Research Functions
+     ***********************/
+    function toggleResearch() {
+      const btn = document.getElementById('researchBtn');
+      if (!btn) return;
+      
+      // Toggle the state
+      enableResearch = !enableResearch;
+      
+      // Store preference
+      localStorage.setItem('researchEnabled', enableResearch.toString());
+      
+      // Update button appearance with active class
+      if (enableResearch) {
+        btn.classList.add('bg-purple-500', 'text-white');
+        btn.classList.remove('bg-dark-500', 'text-gray-300');
+        btn.title = "Research mode is enabled (click to disable)";
+        
+        // Open research modal when research mode is enabled
+        openResearchModal();
+      } else {
+        btn.classList.remove('bg-purple-500', 'text-white');
+        btn.classList.add('bg-dark-500', 'text-gray-300');
+        btn.title = "Research mode is disabled (click to enable)";
+      }
+      
+      // Show notification
+      showNotification(enableResearch ? 'Research mode enabled' : 'Research mode disabled');
+      
+      console.log(`Research mode ${enableResearch ? 'enabled' : 'disabled'}`);
+    }
+
+    function openResearchModal() {
+      const researchModal = document.getElementById('researchModal');
+      if (researchModal) {
+        researchModal.style.display = 'flex';
+        
+        // Focus on the input field
+        setTimeout(() => {
+          const researchInput = document.getElementById('researchSubject');
+          if (researchInput) {
+            researchInput.focus();
+          }
+        }, 100);
+      }
+    }
+    
+    function closeResearchModal() {
+      const researchModal = document.getElementById('researchModal');
+      if (researchModal) {
+        researchModal.style.display = 'none';
+      }
+    }
+    
+    async function executeResearch() {
+      const subjectInput = document.getElementById('researchSubject');
+      const statusDiv = document.getElementById('researchStatus');
+      const executeBtn = document.getElementById('executeResearchBtn');
+      const addToConversationBtn = document.getElementById('addToConversationBtn');
+      
+      if (!subjectInput || !statusDiv || !executeBtn) return;
+      
+      const subject = subjectInput.value.trim();
+      
+      if (!subject) {
+        showNotification('Please enter a research subject');
+        return;
+      }
+      
+      try {
+        // Show status and disable button
+        statusDiv.classList.remove('hidden');
+        executeBtn.disabled = true;
+        executeBtn.textContent = 'Searching...';
+        
+        // Hide the add to conversation button while searching
+        if (addToConversationBtn) {
+          addToConversationBtn.classList.add('hidden');
+        }
+        
+        // Call the Abacus.AI API through our serverless function
+        const response = await fetch(RESEARCH_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            subject: subject
+          })
+        });
+        
+        if (!response.ok) {
+          let errorText = 'Error fetching research papers';
+          try {
+            const errorData = await response.json();
+            errorText = errorData.error || errorText;
+          } catch (e) {
+            console.error('Could not parse error response:', e);
+          }
+          throw new Error(errorText);
+        }
+        
+        const data = await response.json();
+        currentResearchResults = data.research_papers;
+        
+        // Show the add to conversation button
+        if (addToConversationBtn) {
+          addToConversationBtn.classList.remove('hidden');
+        }
+        
+        showNotification('Research completed successfully');
+      } catch (error) {
+        console.error('Research error:', error);
+        showNotification('Error: ' + error.message);
+        currentResearchResults = null;
+      } finally {
+        // Hide status and re-enable button
+        statusDiv.classList.add('hidden');
+        executeBtn.disabled = false;
+        executeBtn.textContent = 'Search for Papers';
+      }
+    }
+    
+    function addResearchToConversation() {
+      if (!currentResearchResults) {
+        showNotification('No research results to add');
+        return;
+      }
+      
+      const subject = document.getElementById('researchSubject')?.value.trim() || 'the requested topic';
+      
+      // Add a user message indicating the research request
+      addMessageToCurrentThread(`Please provide research papers on ${subject}`, "user");
+      
+      // Add the research results as a bot message
+      addMessageToCurrentThread(currentResearchResults, "bot");
+      
+      // Close the modal
+      closeResearchModal();
+      
+      // Reset research mode
+      enableResearch = false;
+      const researchBtn = document.getElementById('researchBtn');
+      if (researchBtn) {
+        researchBtn.classList.remove('bg-purple-500', 'text-white');
+        researchBtn.classList.add('bg-dark-500', 'text-gray-300');
       }
     }
     
@@ -3728,13 +3939,21 @@ Separate your steps with periods. Write your final answer after the #### separat
           webSearchBtn.classList.remove('bg-dark-500', 'text-gray-300');
         }
 
+        // Initialize Research button state
+        const researchBtn = document.getElementById('researchBtn');
+        if (researchBtn && enableResearch) {
+          researchBtn.classList.add('bg-purple-500', 'text-white');
+          researchBtn.classList.remove('bg-dark-500', 'text-gray-300');
+        }
+
         // Ensure all buttons have proper click handlers - fallback approach
         setTimeout(() => {
           console.log("Adding fallback click handlers to critical buttons");
           // Critical buttons - direct click bindings
           const criticalButtonIds = [
             'sendBtn', 'openSettings', 'saveSettings', 'newThreadBtn', 
-            'deleteThreadBtn', 'clearThreadBtn', 'webSearchBtn'
+            'deleteThreadBtn', 'clearThreadBtn', 'webSearchBtn', 'researchBtn',
+            'closeResearchModal', 'executeResearchBtn', 'addToConversationBtn'
           ];
           
           criticalButtonIds.forEach(id => {
@@ -3746,7 +3965,15 @@ Separate your steps with periods. Write your final answer after the #### separat
               button.parentNode.replaceChild(newButton, button);
               
               // Re-attach event handler
-              if (id === 'sendBtn') {
+              if (id === 'researchBtn') {
+                newButton.addEventListener('click', toggleResearch);
+              } else if (id === 'closeResearchModal') {
+                newButton.addEventListener('click', closeResearchModal);
+              } else if (id === 'executeResearchBtn') {
+                newButton.addEventListener('click', executeResearch);
+              } else if (id === 'addToConversationBtn') {
+                newButton.addEventListener('click', addResearchToConversation);
+              } else if (id === 'sendBtn') {
                 newButton.addEventListener('click', () => {
                   console.log("Send button clicked");
                   const textarea = document.getElementById('userInput');
@@ -3795,3 +4022,4 @@ Separate your steps with periods. Write your final answer after the #### separat
 
 </body></html>
 <script async data-explicit-opt-in="true" data-cookie-opt-in="true" data-deployment-id="dpl_EEr9Yz2u7oEhLeG5Cb85Zo6DdD2z" src="https://vercel.live/_next-live/feedback/feedback.js"></script>
+<script async data-explicit-opt-in="true" data-cookie-opt-in="true" data-deployment-id="dpl_BVqETVoxtxV3Vk8m6PByDCDdVSCo" src="https://vercel.live/_next-live/feedback/feedback.js"></script>
