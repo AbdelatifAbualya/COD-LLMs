@@ -25,12 +25,14 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Get API key and deployment token from environment variables
+    // Get ALL needed API credentials from environment variables
     const DEPLOYMENT_TOKEN = process.env.ABACUS_DEPLOYMENT_TOKEN;
     const DEPLOYMENT_ID = process.env.ABACUS_DEPLOYMENT_ID;
+    const ABACUS_API_KEY = process.env.ABACUS_API_KEY; // Added this for Python agent
     
     console.log("Environment check: ABACUS_DEPLOYMENT_TOKEN exists?", !!DEPLOYMENT_TOKEN);
     console.log("Environment check: ABACUS_DEPLOYMENT_ID exists?", !!DEPLOYMENT_ID);
+    console.log("Environment check: ABACUS_API_KEY exists?", !!ABACUS_API_KEY);
     
     if (!DEPLOYMENT_TOKEN || !DEPLOYMENT_ID) {
       console.error("ERROR: Abacus.AI credentials are missing in environment variables");
@@ -38,7 +40,7 @@ module.exports = async (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.status(500).json({
         error: 'Abacus.AI credentials not configured',
-        message: 'Please set ABACUS_DEPLOYMENT_TOKEN and ABACUS_DEPLOYMENT_ID in your Vercel environment variables'
+        message: 'Please set ABACUS_DEPLOYMENT_TOKEN, ABACUS_DEPLOYMENT_ID, and ABACUS_API_KEY in your Vercel environment variables'
       });
       return;
     }
@@ -78,7 +80,9 @@ module.exports = async (req, res) => {
       
       // Prepare the keyword arguments
       const keywordArgs = {
-        subject: query
+        subject: query,
+        // Pass the API key as a parameter to the agent
+        api_key: ABACUS_API_KEY
       };
       
       if (email) {
@@ -129,7 +133,6 @@ module.exports = async (req, res) => {
       console.log("Abacus.AI API response received successfully");
       
       // Format the research papers data for the chatbot
-      // Note: This assumes the agent returns data in the format specified in your example
       const researchPapers = data.research_papers || "No research papers found.";
       
       // Return processed response
