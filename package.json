@@ -1,10 +1,18 @@
 {
-  "name": "chatbot-project",
-  "version": "1.0.0",
+  "name": "enhanced-llm-playground",
+  "version": "1.1.0",
+  "description": "Interactive web-based playground for experimenting with LLMs via Fireworks.ai with web search capabilities",
   "scripts": {
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.9"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^28.15.6"
   }
 }
