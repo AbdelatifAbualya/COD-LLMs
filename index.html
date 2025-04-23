@@ -145,12 +145,54 @@
               <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
             </svg>
           </button>
+          <button id="websearchBtn" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2 rounded-lg transition" title="Search the web for this topic">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
           <button id="researchBtn" class="bg-dark-500 hover:bg-dark-400 text-gray-300 p-2 rounded-lg transition" title="Research papers on this topic">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
             </svg>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web Search Modal -->
+  <div id="websearchModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-dark-700 rounded-xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="p-5 border-b border-dark-600 flex justify-between items-center">
+        <h2 class="text-xl font-semibold">Web Search</h2>
+        <button id="closeWebsearchModal" class="text-gray-400 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-5">
+        <label for="searchQuery" class="block text-sm font-medium text-gray-300 mb-2">Search Query:</label>
+        <input type="text" id="searchQuery" class="w-full bg-dark-600 border border-dark-500 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4" placeholder="Enter search query (e.g., latest AI research trends)">
+        
+        <div id="searchStatus" class="hidden mb-4 p-3 bg-dark-600 rounded-lg text-center">
+          <div class="flex justify-center items-center">
+            <svg class="animate-spin h-5 w-5 text-primary-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Searching the web...</span>
+          </div>
+        </div>
+        
+        <button id="executeSearchBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white py-3 px-4 rounded-lg transition mt-2">
+          Search Web
+        </button>
+        
+        <button id="addSearchToConversationBtn" class="w-full bg-dark-500 hover:bg-dark-400 text-gray-300 py-3 px-4 rounded-lg transition mt-2 hidden">
+          Add Search Results to Conversation
+        </button>
       </div>
     </div>
   </div>
@@ -297,11 +339,14 @@
     let MODEL_NAME = "accounts/fireworks/models/deepseek-v3";
     let MODEL_NAME_DISPLAY = "DeepSeek V3";
     let enableResearch = false;
+    let enableWebSearch = false;
     let currentResearchResults = null;
+    let currentWebSearchResults = null;
     
     // API endpoints
     const API_PROXY_URL = "/api/proxy";
     const RESEARCH_API_URL = "/api/abacus-research";
+    const WEBSEARCH_API_URL = "/api/abacus-websearch";
     
     // Reasoning Method
     let REASONING_METHOD = "cod"; // Options: "standard", "cot", "cod"
@@ -524,12 +569,54 @@ A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 s
       return messageArray;
     }
     
-    async function sendMessage(message) {
+    async function sendMessage(message, withWebSearch = false) {
       if (!message.trim()) return;
       
       // Add user message to chat
       addMessage(message, "user");
       
+      // Check if we need to do a web search first
+      if (withWebSearch) {
+        addMessage("Searching the web for your query...", "bot", true);
+        
+        try {
+          const searchResults = await performWebSearch(message);
+          
+          // Update the placeholder with search status
+          messages[messages.length - 1] = {
+            content: "Found relevant information from the web. Generating response...",
+            sender: "bot",
+            isPlaceholder: true,
+            timestamp: new Date()
+          };
+          
+          renderMessages();
+          
+          // Now send the search results and the original query to the LLM
+          await sendWithContext(message, searchResults);
+        } catch (error) {
+          console.error("Web search error:", error);
+          
+          // Update the placeholder with error message
+          messages[messages.length - 1] = {
+            content: `Unable to search the web. I'll try to answer based on my knowledge.\n\nError: ${error.message}`,
+            sender: "bot",
+            isPlaceholder: false,
+            timestamp: new Date()
+          };
+          
+          renderMessages();
+          
+          // Continue with normal message flow without search
+          await sendNormalMessage(message);
+        }
+      } else {
+        // Normal message flow without search
+        await sendNormalMessage(message);
+      }
+    }
+    
+    async function sendNormalMessage(message) {
       // Add placeholder message showing we're thinking
       addMessage("Thinking...", "bot", true);
       
@@ -591,6 +678,210 @@ A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 s
         };
         
         renderMessages();
+      }
+    }
+    
+    async function sendWithContext(message, searchResults) {
+      try {
+        // Create a special context message with search results
+        const contextMessage = `You are a helpful assistant with access to the latest information from the web. Use the following search results to answer the user's question:\n\n${searchResults}\n\nIf the search results don't contain the answer, acknowledge that and answer based on your own knowledge. Remember to cite sources when available.`;
+        
+        // Build messages array for API
+        const messagesForApi = [
+          {
+            role: "system",
+            content: contextMessage
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ];
+        
+        // Create payload for API request
+        const payload = {
+          model: MODEL_NAME,
+          messages: messagesForApi,
+          temperature: TEMPERATURE,
+          max_tokens: MAX_TOKENS,
+          stream: ENABLE_STREAMING
+        };
+        
+        // Add timestamp to URL to prevent caching
+        const timestamp = new Date().getTime();
+        const cacheBuster = `?t=${timestamp}`;
+        
+        const response = await fetch(`${API_PROXY_URL}${cacheBuster}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const botReply = data.choices && 
+                        data.choices[0] && 
+                        data.choices[0].message && 
+                        data.choices[0].message.content;
+        
+        if (botReply) {
+          // Replace the placeholder with the actual response
+          messages[messages.length - 1] = {
+            content: botReply.trim(),
+            sender: "bot",
+            isPlaceholder: false,
+            timestamp: new Date()
+          };
+          
+          renderMessages();
+        } else {
+          throw new Error("No valid response from API");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        
+        // Update placeholder with error message
+        messages[messages.length - 1] = {
+          content: `Error: ${error.message}`,
+          sender: "bot",
+          isPlaceholder: false,
+          timestamp: new Date()
+        };
+        
+        renderMessages();
+      }
+    }
+    
+    /***********************
+     * Web Search Functions
+     ***********************/
+    async function performWebSearch(query) {
+      const response = await fetch(WEBSEARCH_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Web search failed: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data.search_results || "No relevant search results found.";
+    }
+    
+    function toggleWebSearch() {
+      enableWebSearch = !enableWebSearch;
+      
+      const websearchBtn = document.getElementById('websearchBtn');
+      if (websearchBtn) {
+        if (enableWebSearch) {
+          websearchBtn.classList.add('bg-primary-500', 'text-white');
+          websearchBtn.classList.remove('bg-dark-500', 'text-gray-300');
+          
+          // Open web search modal
+          openWebsearchModal();
+        } else {
+          websearchBtn.classList.remove('bg-primary-500', 'text-white');
+          websearchBtn.classList.add('bg-dark-500', 'text-gray-300');
+        }
+      }
+      
+      showNotification(enableWebSearch ? 'Web search mode enabled' : 'Web search mode disabled');
+    }
+    
+    function openWebsearchModal() {
+      const websearchModal = document.getElementById('websearchModal');
+      if (websearchModal) {
+        websearchModal.style.display = 'flex';
+        
+        // Focus on the input field
+        setTimeout(() => {
+          const searchInput = document.getElementById('searchQuery');
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }, 100);
+      }
+    }
+    
+    function closeWebsearchModal() {
+      const websearchModal = document.getElementById('websearchModal');
+      if (websearchModal) {
+        websearchModal.style.display = 'none';
+      }
+    }
+    
+    async function executeWebSearch() {
+      const queryInput = document.getElementById('searchQuery');
+      const statusDiv = document.getElementById('searchStatus');
+      const executeBtn = document.getElementById('executeSearchBtn');
+      const addToConversationBtn = document.getElementById('addSearchToConversationBtn');
+      
+      if (!queryInput || !statusDiv || !executeBtn) return;
+      
+      const query = queryInput.value.trim();
+      
+      if (!query) {
+        showNotification('Please enter a search query');
+        return;
+      }
+      
+      try {
+        // Show status and disable button
+        statusDiv.classList.remove('hidden');
+        executeBtn.disabled = true;
+        executeBtn.textContent = 'Searching...';
+        
+        // Hide the add to conversation button while searching
+        if (addToConversationBtn) {
+          addToConversationBtn.classList.add('hidden');
+        }
+        
+        // Call the Abacus.AI Web Search API through our serverless function
+        currentWebSearchResults = await performWebSearch(query);
+        
+        // Show the add to conversation button
+        if (addToConversationBtn) {
+          addToConversationBtn.classList.remove('hidden');
+        }
+        
+        showNotification('Web search completed successfully');
+      } catch (error) {
+        console.error('Web search error:', error);
+        showNotification('Error: ' + error.message);
+        currentWebSearchResults = null;
+      } finally {
+        // Hide status and re-enable button
+        statusDiv.classList.add('hidden');
+        executeBtn.disabled = false;
+        executeBtn.textContent = 'Search Web';
+      }
+    }
+    
+    function addWebSearchToConversation() {
+      if (!currentWebSearchResults) {
+        showNotification('No search results to add');
+        return;
+      }
+      
+      const query = document.getElementById('searchQuery')?.value.trim() || 'the requested topic';
+      
+      // Send message with web search results
+      sendMessage(query, true);
+      
+      // Close the modal
+      closeWebsearchModal();
+      
+      // Reset web search mode
+      enableWebSearch = false;
+      const websearchBtn = document.getElementById('websearchBtn');
+      if (websearchBtn) {
+        websearchBtn.classList.remove('bg-primary-500', 'text-white');
+        websearchBtn.classList.add('bg-dark-500', 'text-gray-300');
       }
     }
     
@@ -874,7 +1165,12 @@ A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 s
           if (userInput) {
             const message = userInput.value.trim();
             if (message) {
-              sendMessage(message);
+              // Check if web search mode is active
+              if (enableWebSearch) {
+                sendMessage(message, true);
+              } else {
+                sendMessage(message);
+              }
               userInput.value = '';
               userInput.style.height = 'auto';
             }
@@ -896,6 +1192,28 @@ A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 s
             document.getElementById('sendBtn')?.click();
           }
         });
+      }
+      
+      // Web Search button
+      const websearchBtn = document.getElementById('websearchBtn');
+      if (websearchBtn) {
+        websearchBtn.addEventListener('click', toggleWebSearch);
+      }
+      
+      // Web Search modal
+      const closeWebsearchModalBtn = document.getElementById('closeWebsearchModal');
+      if (closeWebsearchModalBtn) {
+        closeWebsearchModalBtn.addEventListener('click', closeWebsearchModal);
+      }
+      
+      const executeSearchBtn = document.getElementById('executeSearchBtn');
+      if (executeSearchBtn) {
+        executeSearchBtn.addEventListener('click', executeWebSearch);
+      }
+      
+      const addSearchToConversationBtn = document.getElementById('addSearchToConversationBtn');
+      if (addSearchToConversationBtn) {
+        addSearchToConversationBtn.addEventListener('click', addWebSearchToConversation);
       }
       
       // Research button
@@ -991,7 +1309,7 @@ A: Perimeter = 20 cm. Side length = 20/4 = 5 cm. Area = 5² = 25 cm². #### 25 s
       }
       
       // Add welcome message
-      addMessage("Hi there! I'm your AI Research Assistant powered by DeepSeek V3. I can help with general questions and research tasks. Click the research button (📚) to search for academic papers on any topic.", "bot");
+      addMessage("Hi there! I'm your AI Research Assistant powered by DeepSeek V3. I can help with general questions, web searches, and research tasks. Click the web search button (🔍) to search the web or the research button (📚) to search for academic papers on any topic.", "bot");
     });
   </script>
 </body>
